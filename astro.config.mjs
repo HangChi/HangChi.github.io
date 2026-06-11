@@ -6,8 +6,7 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   // 用户主页站：site 直接是根地址，不需要 base。
-  // ↓↓↓ 部署前把 your-username 替换成你的 GitHub 用户名 ↓↓↓
-  site: 'https://your-username.github.io',
+  site: 'https://HangChi.github.io',
   integrations: [mdx(), sitemap()],
   markdown: {
     // 关闭 SmartyPants：避免把中文直角引号、破折号错误转换成英文花引号。

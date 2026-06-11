@@ -114,9 +114,8 @@ const { page } = Astro.props as { page: Page<CollectionEntry<'blog'>> };
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    margin-top: 2.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
+    /* 不再自带顶线，改用最后一篇文章的底线作分隔，间距收紧 */
+    margin-top: 1.8rem;
   }
   .page-btn {
     padding: 0.45rem 1rem;

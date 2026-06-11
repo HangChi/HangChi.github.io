@@ -29,8 +29,12 @@ import { GISCUS } from '../consts';
     const container = document.getElementById('giscus-container');
     if (!container || container.dataset.loaded) return;
 
-    // 未配置真实 ID 时给出友好提示，避免空白
-    if (GISCUS.repoId.startsWith('REPLACE_')) {
+    // 未配置真实 ID 时给出友好提示，避免空白。
+    // repoId 或 categoryId 任一仍是占位符，都视为未配置。
+    if (
+      GISCUS.repoId.startsWith('REPLACE_') ||
+      GISCUS.categoryId.startsWith('REPLACE_')
+    ) {
       container.innerHTML =
         '<p style="color:var(--text-muted);font-size:0.9rem">' +
         '💬 评论区尚未配置。请按 SETUP.md 第 4 节在 src/consts.ts 填入 giscus 信息。</p>';

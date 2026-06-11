@@ -18,9 +18,9 @@ export const POSTS_PER_PAGE = 10;
 // 只要 repoId 仍是 'REPLACE_WITH_REPO_ID'，评论区会显示「未配置」提示，不影响其他功能。
 export const GISCUS = {
   repo: 'HangChi/HangChi.github.io',
-  repoId: 'REPLACE_WITH_REPO_ID',
+  repoId: 'R_kgDOS3JyRA',
   // 分类名与下面的 categoryId 必须对应同一个分类。
   // 推荐用 Announcements（只有你能发起讨论，访客只能回复）。
   category: 'Announcements',
-  categoryId: 'REPLACE_WITH_CATEGORY_ID',
+  categoryId: 'DIC_kwDOS3JyRM4C-7n2',
 } as const;

@@ -5,10 +5,13 @@ import FormattedDate from '../components/FormattedDate.astro';
 import TagList from '../components/TagList.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
-// 取所有非草稿文章，按发布日期降序，首页展示最近 9 篇。
+// 取所有非草稿文章：置顶优先，再按发布日期降序，首页展示最近 9 篇。
 const posts = (await getCollection('blog'))
   .filter((p) => !p.data.draft)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  .sort((a, b) => {
+    if (!!a.data.pinned !== !!b.data.pinned) return a.data.pinned ? -1 : 1;
+    return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+  });
 
 const recent = posts.slice(0, 9);
 ---
@@ -32,7 +35,10 @@ const recent = posts.slice(0, 9);
         recent.map((post) => (
           <li>
             <a class="post-link" href={`/blog/${post.id}/`}>
-              <h3>{post.data.title}</h3>
+              <h3>
+                {post.data.pinned && <span class="pin-badge">📌 置顶</span>}
+                {post.data.title}
+              </h3>
               <p class="desc">{post.data.description}</p>
             </a>
             <div class="post-meta">
@@ -94,6 +100,17 @@ const recent = posts.slice(0, 9);
   .post-link h3 {
     margin: 0 0 0.3rem;
     color: var(--text);
+  }
+  .pin-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--tag-text);
+    background: var(--tag-bg);
+    padding: 0.1em 0.55em;
+    border-radius: 999px;
+    margin-right: 0.45em;
+    vertical-align: middle;
   }
   .post-link:hover h3 {
     color: var(--link);

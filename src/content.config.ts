@@ -15,6 +15,8 @@ const blog = defineCollection({
     tags: z.array(z.string()).default([]),
     // 草稿标记：为 true 时不在列表/RSS 中展示。
     draft: z.boolean().default(false),
+    // 置顶：为 true 时在首页和文章列表中排到最前。
+    pinned: z.boolean().default(false),
   }),
 });
 

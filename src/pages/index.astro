@@ -5,12 +5,12 @@ import FormattedDate from '../components/FormattedDate.astro';
 import TagList from '../components/TagList.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
-// 取所有非草稿文章，按发布日期降序，首页只展示最近 5 篇。
+// 取所有非草稿文章，按发布日期降序，首页展示最近 9 篇。
 const posts = (await getCollection('blog'))
   .filter((p) => !p.data.draft)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-const recent = posts.slice(0, 5);
+const recent = posts.slice(0, 9);
 ---
 
 <Layout wide>
@@ -86,6 +86,10 @@ const recent = posts.slice(0, 5);
   .post-list li {
     padding: 1.2rem 0;
     border-bottom: 1px solid var(--border);
+  }
+  /* 去掉最后一项的分隔线，避免底部出现孤立横线 */
+  .post-list li:last-child {
+    border-bottom: none;
   }
   .post-link h3 {
     margin: 0 0 0.3rem;

@@ -2,6 +2,8 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 
 // https://astro.build/config
 export default defineConfig({
@@ -9,6 +11,10 @@ export default defineConfig({
   site: 'https://HangChi.github.io',
   integrations: [mdx(), sitemap()],
   markdown: {
+    // 数学公式：remark-math 解析 $...$，rehype-katex 渲染成 KaTeX。
+    // 需配合 KaTeX CSS（见 src/layouts/BlogPost.astro）。
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [rehypeKatex],
     // 关闭 SmartyPants：避免把中文直角引号、破折号错误转换成英文花引号。
     // 注：Astro 6 默认 smartypants=true，故此处必须显式 false（删掉会破坏中文标点）。
     // 构建时会有一行 deprecated 黄色提示，可安全忽略——官方称未来大版本才移除，届时再迁移到 processor API。

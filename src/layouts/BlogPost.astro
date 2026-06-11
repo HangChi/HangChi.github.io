@@ -5,6 +5,8 @@ import Layout from './Layout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import TagList from '../components/TagList.astro';
 import Comments from '../components/Comments.astro';
+// KaTeX 数学公式样式（题解里的 $O(n)$ 等公式渲染所需）
+import 'katex/dist/katex.min.css';
 
 type Props = CollectionEntry<'blog'>['data'];
 

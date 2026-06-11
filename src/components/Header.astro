@@ -5,7 +5,10 @@ import ThemeToggle from './ThemeToggle.astro';
 
 <header>
   <nav>
-    <a href="/" class="site-title">{SITE_TITLE}</a>
+    <a href="/" class="site-title">
+      <img class="logo" src="/logo.png" alt="爱达堡的技术博客" width="32" height="32" />
+      <span>{SITE_TITLE}</span>
+    </a>
     <div class="nav-right">
       <div class="links">
         <a href="/">首页</a>
@@ -37,9 +40,17 @@ import ThemeToggle from './ThemeToggle.astro';
     gap: 1rem;
   }
   .site-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     font-weight: 700;
     font-size: 1.15rem;
     color: var(--text);
+  }
+  .site-title .logo {
+    flex-shrink: 0;
+    display: block;
+    border-radius: 6px;
   }
   .site-title:hover {
     text-decoration: none;

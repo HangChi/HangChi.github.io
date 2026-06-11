@@ -16,7 +16,7 @@ for (const post of posts) {
 const tags = [...counts.entries()].sort((a, b) => b[1] - a[1]);
 ---
 
-<Layout title="标签" description="按标签浏览全部文章">
+<Layout title="标签" description="按标签浏览全部文章" wide>
   <h1>标签</h1>
   <p class="count">共 {tags.length} 个标签</p>
 

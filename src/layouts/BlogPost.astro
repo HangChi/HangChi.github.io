@@ -61,4 +61,30 @@ const { title, description, pubDate, updatedDate, heroImage, tags } =
   .updated {
     font-style: italic;
   }
+
+  /* 文章正文里的宽表格：窄屏可横向滚动，不撑破版面 */
+  .content :global(table) {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  /* 文章页响应式 */
+  @media (max-width: 768px) {
+    .hero {
+      max-height: 240px;
+      margin-bottom: 1.2rem;
+    }
+    .post-header {
+      margin-bottom: 1.5rem;
+    }
+    .content :global(table) {
+      font-size: 0.88rem;
+    }
+    .content :global(th),
+    .content :global(td) {
+      padding: 0.4em 0.6em;
+    }
+  }
 </style>

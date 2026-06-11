@@ -28,7 +28,9 @@
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
     'Liberation Mono', monospace;
 
+  /* 两级宽度：正文窄列（利于阅读）+ 列表/首页宽列（更充实） */
   --width-content: 720px;
+  --width-wide: 960px;
   color-scheme: light;
 }
 
@@ -77,6 +79,11 @@ main {
   max-width: var(--width-content);
   margin: 0 auto;
   padding: 2rem 1rem 4rem;
+}
+
+/* 首页 / 列表页 / 标签页用更宽的容器 */
+main.wide {
+  max-width: var(--width-wide);
 }
 
 /* 标题 */
@@ -197,4 +204,45 @@ li {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* ============================================================
+   响应式断点
+   - 平板及以下 ≤ 768px：缩小标题、收紧间距
+   - 手机 ≤ 480px：进一步缩小字号，加大可点区域
+   ============================================================ */
+
+@media (max-width: 768px) {
+  main {
+    padding: 1.5rem 1.1rem 3rem;
+  }
+  h1 { font-size: 1.7rem; }
+  h2 { font-size: 1.35rem; }
+  h3 { font-size: 1.15rem; }
+  body {
+    font-size: 15.5px;
+  }
+  pre.astro-code {
+    /* 代码块在手机上贴近屏幕边缘，给更紧凑的内边距 */
+    padding: 0.85rem 0.95rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  main {
+    padding: 1.2rem 0.9rem 2.5rem;
+  }
+  h1 { font-size: 1.5rem; }
+  body {
+    /* 手机上略微收窄字间距，避免中文行过满 */
+    letter-spacing: 0.01em;
+  }
+}
+
+/* 触屏设备：链接下划线常驻，hover 效果改为 active 反馈 */
+@media (hover: none) {
+  a:hover {
+    text-decoration: none;
+  }
 }

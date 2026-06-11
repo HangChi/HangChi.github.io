@@ -13,7 +13,7 @@ const posts = (await getCollection('blog'))
 const recent = posts.slice(0, 5);
 ---
 
-<Layout>
+<Layout wide>
   <section class="hero">
     <h1>{SITE_TITLE}</h1>
     <p>{SITE_DESCRIPTION}</p>
@@ -49,11 +49,11 @@ const recent = posts.slice(0, 5);
 <style>
   .hero {
     text-align: center;
-    padding: 2.5rem 0 1.5rem;
+    padding: 3.5rem 0 2.5rem;
   }
   .hero h1 {
     margin: 0 0 0.5rem;
-    font-size: 2.4rem;
+    font-size: 2.6rem;
   }
   .hero p {
     color: var(--text-muted);
@@ -109,5 +109,28 @@ const recent = posts.slice(0, 5);
     flex-wrap: wrap;
     color: var(--text-muted);
     font-size: 0.88rem;
+  }
+
+  /* 平板：hero 适度缩小 */
+  @media (max-width: 768px) {
+    .hero {
+      padding: 2.5rem 0 1.8rem;
+    }
+    .hero h1 {
+      font-size: 2.1rem;
+    }
+    .hero p {
+      font-size: 1rem;
+    }
+  }
+
+  /* 手机：hero 再收紧 */
+  @media (max-width: 480px) {
+    .hero {
+      padding: 1.8rem 0 1.4rem;
+    }
+    .hero h1 {
+      font-size: 1.7rem;
+    }
   }
 </style>

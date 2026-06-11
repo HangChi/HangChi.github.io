@@ -34,6 +34,13 @@
     background: var(--bg-subtle);
     border-color: var(--text-muted);
   }
+  /* 手机上增大可点击区域，符合触屏可达性 */
+  @media (max-width: 480px) {
+    #theme-toggle {
+      width: 42px;
+      height: 42px;
+    }
+  }
   /* 默认（浅色）：显示太阳、隐藏月亮 */
   .icon-moon { display: none; }
   .icon-sun { display: block; }

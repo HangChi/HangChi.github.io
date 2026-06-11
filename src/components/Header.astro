@@ -28,9 +28,9 @@ import ThemeToggle from './ThemeToggle.astro';
     transition: background-color 0.2s ease, border-color 0.2s ease;
   }
   nav {
-    max-width: var(--width-content);
+    max-width: var(--width-wide);
     margin: 0 auto;
-    padding: 0.8rem 1rem;
+    padding: 0.8rem 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -62,9 +62,42 @@ import ThemeToggle from './ThemeToggle.astro';
     color: var(--link);
     text-decoration: none;
   }
-  @media (max-width: 520px) {
-    .links { gap: 0.8rem; }
-    .links a { font-size: 0.88rem; }
-    .site-title { font-size: 1rem; }
+
+  /* 平板：收紧导航间距与内边距 */
+  @media (max-width: 768px) {
+    nav {
+      padding: 0.7rem 1.1rem;
+    }
+    .nav-right {
+      gap: 0.8rem;
+    }
+    .links {
+      gap: 0.9rem;
+    }
+  }
+
+  /* 手机：导航换成两行——标题一行，菜单+主题钮一行并居中 */
+  @media (max-width: 480px) {
+    nav {
+      flex-direction: column;
+      gap: 0.6rem;
+      padding: 0.7rem 1rem;
+    }
+    .nav-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+    .site-title {
+      font-size: 1.05rem;
+    }
+    .links {
+      gap: 1.2rem;
+    }
+    .links a {
+      font-size: 0.9rem;
+      /* 增大触屏可点击区域 */
+      padding: 0.3rem 0;
+      display: inline-block;
+    }
   }
 </style>

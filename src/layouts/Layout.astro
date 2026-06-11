@@ -9,12 +9,15 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  // 宽布局：首页/列表/标签页传 true，用更宽的容器。
+  wide?: boolean;
 }
 
 const {
   title = SITE_TITLE,
   description = SITE_DESCRIPTION,
   image,
+  wide = false,
 } = Astro.props;
 ---
 
@@ -25,7 +28,7 @@ const {
   </head>
   <body>
     <Header />
-    <main>
+    <main class={wide ? 'wide' : undefined}>
       <slot />
     </main>
     <Footer />

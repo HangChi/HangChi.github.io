@@ -2,23 +2,14 @@
 /*
   Giscus 评论组件（基于 GitHub Discussions，免费无广告）。
 
-  ⚠️ 使用前需要你完成以下配置（详见项目根目录 SETUP.md 第 4 节）：
-    1. 在你的 GitHub 博客仓库开启 Discussions 功能
-    2. 安装 giscus app: https://github.com/apps/giscus
-    3. 打开 https://giscus.app ，填入仓库，复制生成的
-       data-repo / data-repo-id / data-category / data-category-id
-    4. 替换下面 4 个占位符
+  配置在 src/consts.ts 的 GISCUS 对象里，按 SETUP.md 第 4 节填入
+  repoId / categoryId 即可启用。未配置时显示友好提示，不影响其他功能。
 
-  主题会自动跟随站点深色模式（监听 theme-change 事件）。
+  特性：
+  - 懒加载：滚动到评论区附近才加载 giscus，首屏更快、更省流量。
+  - 主题联动：跟随站点深色模式（监听 theme-change 事件）。
 */
-
-// ↓↓↓ 把这 4 个值替换成 giscus.app 生成的真实值 ↓↓↓
-const GISCUS = {
-  repo: 'HangChi/HangChi.github.io',
-  repoId: 'REPLACE_WITH_REPO_ID',
-  category: 'Announcements',
-  categoryId: 'REPLACE_WITH_CATEGORY_ID',
-};
+import { GISCUS } from '../consts';
 ---
 
 <section class="comments" aria-label="评论">
@@ -26,10 +17,7 @@ const GISCUS = {
   <div id="giscus-container"></div>
 </section>
 
-<script
-  is:inline
-  define:vars={{ GISCUS }}
->
+<script is:inline define:vars={{ GISCUS }}>
   // 根据当前站点主题决定 giscus 主题
   function currentGiscusTheme() {
     return document.documentElement.classList.contains('dark')
@@ -37,7 +25,7 @@ const GISCUS = {
       : 'light';
   }
 
-  function loadGiscus() {
+  function injectGiscus() {
     const container = document.getElementById('giscus-container');
     if (!container || container.dataset.loaded) return;
 
@@ -45,7 +33,8 @@ const GISCUS = {
     if (GISCUS.repoId.startsWith('REPLACE_')) {
       container.innerHTML =
         '<p style="color:var(--text-muted);font-size:0.9rem">' +
-        '💬 评论区尚未配置。请按 SETUP.md 第 4 节填入 giscus 信息。</p>';
+        '💬 评论区尚未配置。请按 SETUP.md 第 4 节在 src/consts.ts 填入 giscus 信息。</p>';
+      container.dataset.loaded = '1';
       return;
     }
 
@@ -62,13 +51,35 @@ const GISCUS = {
     s.setAttribute('data-input-position', 'top');
     s.setAttribute('data-theme', currentGiscusTheme());
     s.setAttribute('data-lang', 'zh-CN');
+    s.setAttribute('data-loading', 'lazy');
     s.setAttribute('crossorigin', 'anonymous');
     s.async = true;
     container.appendChild(s);
     container.dataset.loaded = '1';
   }
 
-  loadGiscus();
+  // 懒加载：评论区进入视口（提前 200px）再注入 giscus。
+  function setupLazyLoad() {
+    const container = document.getElementById('giscus-container');
+    if (!container) return;
+
+    if (!('IntersectionObserver' in window)) {
+      injectGiscus(); // 不支持时直接加载
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          injectGiscus();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(container);
+  }
+
+  setupLazyLoad();
 
   // 站点切换主题时，向 giscus iframe 发送 postMessage 同步主题
   window.addEventListener('theme-change', (e) => {

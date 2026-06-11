@@ -53,18 +53,51 @@ heroImage: '/xxx.jpg' # 可选，封面图
 
 ---
 
-## 4. 配置评论（Giscus，可选但推荐）
+## 4. 配置评论（Giscus）
 
-评论基于 GitHub Discussions，需要在仓库建好后操作：
+评论基于 GitHub Discussions。配置写在 **`src/consts.ts` 的 `GISCUS` 对象**里，
+`repo` 已填好（`HangChi/HangChi.github.io`），只差 `repoId` 和 `categoryId` 两个值。
 
-1. 仓库 **Settings → General → Features** 勾选 **Discussions**
-2. 安装 giscus app：<https://github.com/apps/giscus> → 授权给你的博客仓库
-3. 打开 <https://giscus.app>，在「仓库」填 `你的用户名/你的用户名.github.io`，
-   页面下方会生成一段配置，复制其中 4 个值
-4. 把它们填进 `src/components/Comments.astro` 顶部的 `GISCUS` 对象：
-   - `repo`、`repoId`、`category`、`categoryId`
+### 4.1 准备仓库（必做前提）
 
-> 没配置时评论区会显示一行友好提示，不影响其他功能。
+1. 仓库必须是 **Public**
+2. **Settings → General → Features** 勾选 **Discussions**
+3. 安装 giscus app：<https://github.com/apps/giscus> → 授权给本仓库
+
+### 4.2 取得两个 ID
+
+打开 <https://giscus.app>，在「仓库 / Repository」填 `HangChi/HangChi.github.io`。
+若前提就绪，页面会显示 ✅ 并在下方「启用 giscus」代码块里生成：
+
+```
+data-repo-id="R_kgD..."          ← 这是 repoId
+data-category-id="DIC_kwD..."    ← 这是 categoryId
+```
+
+> 进阶（可选）：也可用命令行直接查分类，复制返回里的 `id`：
+> `curl "https://giscus.app/api/discussions/categories?repo=HangChi/HangChi.github.io"`
+
+### 4.3 填进配置
+
+编辑 `src/consts.ts`，把两个值替换进去：
+
+```ts
+export const GISCUS = {
+  repo: 'HangChi/HangChi.github.io',
+  repoId: '粘贴 data-repo-id',
+  category: 'Announcements',        // 与下面 categoryId 对应同一分类
+  categoryId: '粘贴 data-category-id',
+};
+```
+
+然后提交并推送：
+```bash
+git commit -am "feat: 配置 giscus 评论"
+git push
+```
+
+> 没配置时评论区只显示一行友好提示，不影响其他功能。
+> 评论组件已支持**懒加载**（滚到评论区才加载）和**深色主题联动**。
 
 ---
 

@@ -1,0 +1,94 @@
+---
+/*
+  Giscus 评论组件（基于 GitHub Discussions，免费无广告）。
+
+  ⚠️ 使用前需要你完成以下配置（详见项目根目录 SETUP.md 第 4 节）：
+    1. 在你的 GitHub 博客仓库开启 Discussions 功能
+    2. 安装 giscus app: https://github.com/apps/giscus
+    3. 打开 https://giscus.app ，填入仓库，复制生成的
+       data-repo / data-repo-id / data-category / data-category-id
+    4. 替换下面 4 个占位符
+
+  主题会自动跟随站点深色模式（监听 theme-change 事件）。
+*/
+
+// ↓↓↓ 把这 4 个值替换成 giscus.app 生成的真实值 ↓↓↓
+const GISCUS = {
+  repo: 'your-username/your-username.github.io',
+  repoId: 'REPLACE_WITH_REPO_ID',
+  category: 'Announcements',
+  categoryId: 'REPLACE_WITH_CATEGORY_ID',
+};
+---
+
+<section class="comments" aria-label="评论">
+  <h2>评论</h2>
+  <div id="giscus-container"></div>
+</section>
+
+<script
+  is:inline
+  define:vars={{ GISCUS }}
+>
+  // 根据当前站点主题决定 giscus 主题
+  function currentGiscusTheme() {
+    return document.documentElement.classList.contains('dark')
+      ? 'dark'
+      : 'light';
+  }
+
+  function loadGiscus() {
+    const container = document.getElementById('giscus-container');
+    if (!container || container.dataset.loaded) return;
+
+    // 未配置真实 ID 时给出友好提示，避免空白
+    if (GISCUS.repoId.startsWith('REPLACE_')) {
+      container.innerHTML =
+        '<p style="color:var(--text-muted);font-size:0.9rem">' +
+        '💬 评论区尚未配置。请按 SETUP.md 第 4 节填入 giscus 信息。</p>';
+      return;
+    }
+
+    const s = document.createElement('script');
+    s.src = 'https://giscus.app/client.js';
+    s.setAttribute('data-repo', GISCUS.repo);
+    s.setAttribute('data-repo-id', GISCUS.repoId);
+    s.setAttribute('data-category', GISCUS.category);
+    s.setAttribute('data-category-id', GISCUS.categoryId);
+    s.setAttribute('data-mapping', 'pathname');
+    s.setAttribute('data-strict', '0');
+    s.setAttribute('data-reactions-enabled', '1');
+    s.setAttribute('data-emit-metadata', '0');
+    s.setAttribute('data-input-position', 'top');
+    s.setAttribute('data-theme', currentGiscusTheme());
+    s.setAttribute('data-lang', 'zh-CN');
+    s.setAttribute('crossorigin', 'anonymous');
+    s.async = true;
+    container.appendChild(s);
+    container.dataset.loaded = '1';
+  }
+
+  loadGiscus();
+
+  // 站点切换主题时，向 giscus iframe 发送 postMessage 同步主题
+  window.addEventListener('theme-change', (e) => {
+    const theme = e.detail?.theme || currentGiscusTheme();
+    const iframe = document.querySelector('iframe.giscus-frame');
+    iframe?.contentWindow?.postMessage(
+      { giscus: { setConfig: { theme } } },
+      'https://giscus.app'
+    );
+  });
+</script>
+
+<style>
+  .comments {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .comments h2 {
+    font-size: 1.3rem;
+    margin-top: 0;
+  }
+</style>

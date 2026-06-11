@@ -1,0 +1,87 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+
+// 为每个标签生成一个聚合页。
+export async function getStaticPaths() {
+  const posts = (await getCollection('blog')).filter((p) => !p.data.draft);
+
+  const tagSet = new Set<string>();
+  for (const post of posts) {
+    for (const tag of post.data.tags) tagSet.add(tag);
+  }
+
+  return [...tagSet].map((tag) => {
+    const filtered = posts
+      .filter((p) => p.data.tags.includes(tag))
+      .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+    return {
+      params: { tag },
+      props: { tag, posts: filtered },
+    };
+  });
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<Layout title={`标签：${tag}`} description={`标签 ${tag} 下的全部文章`}>
+  <p class="back"><a href="/tags">← 所有标签</a></p>
+  <h1>#{tag}</h1>
+  <p class="count">共 {posts.length} 篇文章</p>
+
+  <ul class="post-list">
+    {
+      posts.map((post) => (
+        <li>
+          <a class="post-link" href={`/blog/${post.id}/`}>
+            <h2>{post.data.title}</h2>
+            <p class="desc">{post.data.description}</p>
+          </a>
+          <FormattedDate date={post.data.pubDate} />
+        </li>
+      ))
+    }
+  </ul>
+</Layout>
+
+<style>
+  .back a {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+  .count {
+    color: var(--text-muted);
+    margin-top: -0.5rem;
+  }
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0;
+  }
+  .post-list li {
+    padding: 1.2rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .post-link h2 {
+    margin: 0 0 0.3rem;
+    font-size: 1.25rem;
+    color: var(--text);
+  }
+  .post-link:hover {
+    text-decoration: none;
+  }
+  .post-link:hover h2 {
+    color: var(--link);
+  }
+  .desc {
+    color: var(--text-muted);
+    margin: 0 0 0.4rem;
+    font-size: 0.95rem;
+  }
+  time {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+</style>

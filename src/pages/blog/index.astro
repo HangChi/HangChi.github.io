@@ -1,0 +1,73 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import TagList from '../../components/TagList.astro';
+
+// 文章列表页：所有非草稿文章，按日期降序。
+const posts = (await getCollection('blog'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<Layout title={`全部文章 · 共 ${posts.length} 篇`} description="文章归档列表">
+  <h1>全部文章</h1>
+  <p class="count">共 {posts.length} 篇</p>
+
+  <ul class="post-list">
+    {
+      posts.map((post) => (
+        <li>
+          <a class="post-link" href={`/blog/${post.id}/`}>
+            <h2>{post.data.title}</h2>
+            <p class="desc">{post.data.description}</p>
+          </a>
+          <div class="post-meta">
+            <FormattedDate date={post.data.pubDate} />
+            <TagList tags={post.data.tags} />
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</Layout>
+
+<style>
+  .count {
+    color: var(--text-muted);
+    margin-top: -0.5rem;
+  }
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0;
+  }
+  .post-list li {
+    padding: 1.3rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .post-link h2 {
+    margin: 0 0 0.3rem;
+    font-size: 1.3rem;
+    color: var(--text);
+  }
+  .post-link:hover {
+    text-decoration: none;
+  }
+  .post-link:hover h2 {
+    color: var(--link);
+  }
+  .desc {
+    color: var(--text-muted);
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+  }
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+  }
+</style>

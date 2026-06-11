@@ -1,0 +1,32 @@
+---
+import { AUTHOR } from '../consts';
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <p>
+    &copy; {year} {AUTHOR}. 由
+    <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>
+    强力驱动。
+  </p>
+  <p class="rss">
+    <a href="/rss.xml">RSS 订阅</a>
+  </p>
+</footer>
+
+<style>
+  footer {
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    text-align: center;
+    padding: 2rem 1rem;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease;
+  }
+  footer p {
+    margin: 0.3em 0;
+  }
+  .rss a {
+    color: var(--text-muted);
+  }
+</style>

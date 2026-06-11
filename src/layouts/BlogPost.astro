@@ -1,0 +1,64 @@
+---
+// 文章详情布局：标题、元信息、标签、正文、评论。
+import type { CollectionEntry } from 'astro:content';
+import Layout from './Layout.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import TagList from '../components/TagList.astro';
+import Comments from '../components/Comments.astro';
+
+type Props = CollectionEntry<'blog'>['data'];
+
+const { title, description, pubDate, updatedDate, heroImage, tags } =
+  Astro.props;
+---
+
+<Layout title={title} description={description} image={heroImage}>
+  <article>
+    {heroImage && <img class="hero" src={heroImage} alt="" />}
+    <header class="post-header">
+      <h1>{title}</h1>
+      <div class="meta">
+        <FormattedDate date={pubDate} />
+        {
+          updatedDate && (
+            <span class="updated">
+              （更新于 <FormattedDate date={updatedDate} />）
+            </span>
+          )
+        }
+      </div>
+      <TagList tags={tags} />
+    </header>
+
+    <div class="content">
+      <slot />
+    </div>
+
+    <Comments />
+  </article>
+</Layout>
+
+<style>
+  .hero {
+    width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+    margin-bottom: 1.5rem;
+  }
+  .post-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .post-header h1 {
+    margin: 0 0 0.5rem;
+  }
+  .meta {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    margin-bottom: 0.6rem;
+  }
+  .updated {
+    font-style: italic;
+  }
+</style>

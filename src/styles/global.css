@@ -1,0 +1,200 @@
+/*
+  全局样式：中文排版 + 深色模式配色变量。
+  配色用 CSS 变量定义两套（:root 浅色 / html.dark 深色），
+  所有组件颜色都引用变量，切换 html.dark 即可整站换肤。
+*/
+
+/* ===== 引入中文字体（思源黑体 Noto Sans SC） ===== */
+@import '@fontsource/noto-sans-sc/400.css';
+@import '@fontsource/noto-sans-sc/500.css';
+@import '@fontsource/noto-sans-sc/700.css';
+
+/* ===== 浅色主题（默认） ===== */
+:root {
+  --bg: #ffffff;
+  --bg-subtle: #f6f8fa;
+  --text: #1f2328;
+  --text-muted: #656d76;
+  --link: #0969da;
+  --link-hover: #0a5cc7;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --tag-bg: #ddf4ff;
+  --tag-text: #0969da;
+  --shadow: rgba(0, 0, 0, 0.06);
+
+  --font-sans: 'Noto Sans SC', system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    'Liberation Mono', monospace;
+
+  --width-content: 720px;
+  color-scheme: light;
+}
+
+/* ===== 深色主题 ===== */
+html.dark {
+  --bg: #0d1117;
+  --bg-subtle: #161b22;
+  --text: #e6edf3;
+  --text-muted: #9198a1;
+  --link: #4493f8;
+  --link-hover: #6cb0ff;
+  --border: #30363d;
+  --code-bg: #161b22;
+  --tag-bg: #173a5e;
+  --tag-text: #6cb0ff;
+  --shadow: rgba(0, 0, 0, 0.4);
+
+  color-scheme: dark;
+}
+
+/* ===== 基础排版 ===== */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  /* 中文阅读优化：更大行高 + 细微字间距 */
+  line-height: 1.75;
+  letter-spacing: 0.02em;
+  font-size: 16px;
+  /* 主题切换的平滑过渡 */
+  transition: background-color 0.2s ease, color 0.2s ease;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+main {
+  max-width: var(--width-content);
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+
+/* 标题 */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.3;
+  font-weight: 700;
+  margin: 1.6em 0 0.6em;
+}
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+
+p {
+  margin: 0 0 1.2em;
+}
+
+/* 链接 */
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+}
+
+/* 图片 */
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* 行内代码 */
+:not(pre) > code {
+  font-family: var(--font-mono);
+  background: var(--code-bg);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+  border: 1px solid var(--border);
+}
+
+/* 代码块（Shiki 输出 .astro-code） */
+pre.astro-code {
+  padding: 1rem 1.2rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+pre.astro-code code {
+  font-family: var(--font-mono);
+}
+
+/*
+  Shiki 双主题切换：默认显示浅色变量，
+  html.dark 时切换到深色变量（--shiki-dark-*）。
+*/
+html.dark pre.astro-code,
+html.dark pre.astro-code span {
+  color: var(--shiki-dark, inherit) !important;
+  background-color: var(--shiki-dark-bg, inherit) !important;
+  font-style: var(--shiki-dark-font-style, inherit) !important;
+  font-weight: var(--shiki-dark-font-weight, inherit) !important;
+  text-decoration: var(--shiki-dark-text-decoration, inherit) !important;
+}
+
+/* 引用块 */
+blockquote {
+  border-left: 4px solid var(--border);
+  margin: 1.2em 0;
+  padding: 0.4em 1.2em;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  border-radius: 0 6px 6px 0;
+}
+
+/* 分割线 */
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5em 0;
+}
+
+/* 表格 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2em 0;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.8em;
+  text-align: left;
+}
+th {
+  background: var(--bg-subtle);
+}
+
+/* 列表 */
+ul, ol {
+  padding-left: 1.4em;
+}
+li {
+  margin: 0.3em 0;
+}
+
+/* 工具类 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,76 @@
+---
+// SEO meta、字体、全局样式与「防闪烁」主题脚本。
+// 防闪烁脚本必须放在 <head> 内、内容渲染前执行，
+// 这样首屏就带正确的明暗 class，刷新不会闪白。
+import { SITE_TITLE } from '../consts';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+}
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const { title, description, image = '/blog-placeholder-1.jpg' } = Astro.props;
+---
+
+<!-- 全局元信息 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<meta name="generator" content={Astro.generator} />
+
+<!-- 字体预连接（加速 Fontsource 本地字体回退） -->
+<meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+
+<!-- Canonical URL -->
+<link rel="canonical" href={canonicalURL} />
+
+<!-- RSS 自动发现 -->
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  title={SITE_TITLE}
+  href={new URL('rss.xml', Astro.site)}
+/>
+
+<!-- 主 SEO 标签 -->
+<title>{title}</title>
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={new URL(image, Astro.url)} />
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={canonicalURL} />
+<meta property="twitter:title" content={title} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={new URL(image, Astro.url)} />
+
+<!--
+  防闪烁主题脚本：is:inline 确保原样内联、最先执行。
+  优先级：localStorage 用户选择 > 系统偏好。
+-->
+<script is:inline>
+  (function () {
+    const KEY = 'theme';
+    const stored = localStorage.getItem(KEY);
+    const prefersDark = window.matchMedia(
+      '(prefers-color-scheme: dark)'
+    ).matches;
+    const theme = stored || (prefersDark ? 'dark' : 'light');
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+    // 暴露给 ThemeToggle 使用
+    window.__theme = theme;
+  })();
+</script>

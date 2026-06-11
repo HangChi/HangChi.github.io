@@ -1,0 +1,77 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+// 标签总览：统计每个标签的文章数，做成标签云。
+const posts = (await getCollection('blog')).filter((p) => !p.data.draft);
+
+const counts = new Map<string, number>();
+for (const post of posts) {
+  for (const tag of post.data.tags) {
+    counts.set(tag, (counts.get(tag) ?? 0) + 1);
+  }
+}
+
+// 按文章数降序排列
+const tags = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+---
+
+<Layout title="标签" description="按标签浏览全部文章">
+  <h1>标签</h1>
+  <p class="count">共 {tags.length} 个标签</p>
+
+  {tags.length === 0 && <p class="empty">还没有任何标签。</p>}
+
+  <ul class="tag-cloud">
+    {
+      tags.map(([tag, count]) => (
+        <li>
+          <a href={`/tags/${encodeURIComponent(tag)}`}>
+            #{tag} <span class="num">{count}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Layout>
+
+<style>
+  .count {
+    color: var(--text-muted);
+    margin-top: -0.5rem;
+  }
+  .empty {
+    color: var(--text-muted);
+  }
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0;
+  }
+  .tag-cloud a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    padding: 0.35em 0.9em;
+    border-radius: 999px;
+    font-size: 0.95rem;
+  }
+  .tag-cloud a:hover {
+    text-decoration: none;
+    opacity: 0.85;
+  }
+  .num {
+    background: var(--bg);
+    color: var(--text-muted);
+    border-radius: 999px;
+    padding: 0 0.5em;
+    font-size: 0.8rem;
+    min-width: 1.4em;
+    text-align: center;
+  }
+</style>

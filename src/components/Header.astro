@@ -1,0 +1,70 @@
+---
+import { SITE_TITLE } from '../consts';
+import ThemeToggle from './ThemeToggle.astro';
+---
+
+<header>
+  <nav>
+    <a href="/" class="site-title">{SITE_TITLE}</a>
+    <div class="nav-right">
+      <div class="links">
+        <a href="/">首页</a>
+        <a href="/blog">文章</a>
+        <a href="/tags">标签</a>
+        <a href="/about">关于</a>
+      </div>
+      <ThemeToggle />
+    </div>
+  </nav>
+</header>
+
+<style>
+  header {
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  nav {
+    max-width: var(--width-content);
+    margin: 0 auto;
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .site-title {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--text);
+  }
+  .site-title:hover {
+    text-decoration: none;
+    color: var(--link);
+  }
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .links {
+    display: flex;
+    gap: 1.1rem;
+  }
+  .links a {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+  .links a:hover {
+    color: var(--link);
+    text-decoration: none;
+  }
+  @media (max-width: 520px) {
+    .links { gap: 0.8rem; }
+    .links a { font-size: 0.88rem; }
+    .site-title { font-size: 1rem; }
+  }
+</style>

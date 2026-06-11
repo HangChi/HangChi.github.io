@@ -1,0 +1,5 @@
+# 告诉爬虫站点地图位置。部署前把域名替换成你的真实站点。
+User-agent: *
+Allow: /
+
+Sitemap: https://your-username.github.io/sitemap-index.xml

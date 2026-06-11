@@ -32,12 +32,16 @@ const { tags } = Astro.props;
     background: var(--tag-bg);
     color: var(--tag-text);
     padding: 0.15em 0.7em;
-    border-radius: 999px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
     font-size: 0.82rem;
-    transition: opacity 0.15s ease;
+    transition: border-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
   }
+  /* 悬停用品牌描边 + 链接色，而非降透明度（透明边框常驻，无位移） */
   .tags a:hover {
     text-decoration: none;
-    opacity: 0.8;
+    border-color: var(--brand);
+    color: var(--link);
   }
 </style>

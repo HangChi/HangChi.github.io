@@ -33,15 +33,15 @@ const { page } = Astro.props as { page: Page<CollectionEntry<'blog'>> };
     {
       page.data.map((post) => (
         <li>
-          <a class="post-link" href={`/blog/${post.id}/`}>
-            <h2>
-              {post.data.pinned && <span class="pin-badge">📌 置顶</span>}
-              {post.data.title}
-            </h2>
-            <p class="desc">{post.data.description}</p>
-          </a>
-          <div class="post-meta">
-            <FormattedDate date={post.data.pubDate} />
+          <div class="post-date">
+            {post.data.pinned && <span class="pin-flag">置顶</span>}
+            <FormattedDate date={post.data.pubDate} compact />
+          </div>
+          <div class="post-body">
+            <a class="post-link" href={`/blog/${post.id}/`}>
+              <h2 class="post-title">{post.data.title}</h2>
+              <p class="desc">{post.data.description}</p>
+            </a>
             <TagList tags={post.data.tags} />
           </div>
         </li>
@@ -82,48 +82,7 @@ const { page } = Astro.props as { page: Page<CollectionEntry<'blog'>> };
     margin-top: -0.5rem;
   }
   .post-list {
-    list-style: none;
-    padding: 0;
-    margin: 1.5rem 0 0;
-  }
-  .post-list li {
-    padding: 1.3rem 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .post-link h2 {
-    margin: 0 0 0.3rem;
-    font-size: 1.3rem;
-    color: var(--text);
-  }
-  .pin-badge {
-    display: inline-block;
-    font-size: 0.72rem;
-    font-weight: 500;
-    color: var(--tag-text);
-    background: var(--tag-bg);
-    padding: 0.1em 0.55em;
-    border-radius: 999px;
-    margin-right: 0.45em;
-    vertical-align: middle;
-  }
-  .post-link:hover {
-    text-decoration: none;
-  }
-  .post-link:hover h2 {
-    color: var(--link);
-  }
-  .desc {
-    color: var(--text-muted);
-    margin: 0 0 0.5rem;
-    font-size: 0.95rem;
-  }
-  .post-meta {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-    color: var(--text-muted);
-    font-size: 0.88rem;
+    margin-top: 1.5rem;
   }
 
   /* 分页导航 */
@@ -132,22 +91,25 @@ const { page } = Astro.props as { page: Page<CollectionEntry<'blog'>> };
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    /* 不再自带顶线，改用最后一篇文章的底线作分隔，间距收紧 */
-    margin-top: 1.8rem;
+    margin-top: 2.2rem;
   }
   .page-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     padding: 0.45rem 1rem;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     color: var(--text);
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
     white-space: nowrap;
-    transition: background-color 0.15s ease, border-color 0.15s ease;
+    transition: background-color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
   }
   .page-btn:hover {
     text-decoration: none;
     background: var(--bg-subtle);
-    border-color: var(--text-muted);
+    border-color: var(--brand);
   }
   .page-btn.disabled {
     color: var(--text-muted);

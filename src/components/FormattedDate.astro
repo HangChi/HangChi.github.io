@@ -1,17 +1,21 @@
 ---
-// 中文日期格式化组件：输出「2026年6月11日」。
+// 日期格式化组件。
+// 默认输出中文「2026年6月11日」（文章页用）；
+// compact 时输出数字「2026-06-11」（列表左侧日期栏用）。
 interface Props {
   date: Date;
+  compact?: boolean;
 }
-const { date } = Astro.props;
----
-
-<time datetime={date.toISOString()}>
-  {
-    date.toLocaleDateString('zh-CN', {
+const { date, compact = false } = Astro.props;
+const iso = date.toISOString();
+const pad = (n: number) => String(n).padStart(2, '0');
+const text = compact
+  ? `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+  : date.toLocaleDateString('zh-CN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-    })
-  }
-</time>
+    });
+---
+
+<time datetime={iso}>{text}</time>

@@ -1,6 +1,17 @@
 ---
 import { SITE_TITLE } from '../consts';
 import ThemeToggle from './ThemeToggle.astro';
+
+// 当前路径，用于高亮所在导航项（无障碍：aria-current="page"）。
+const path = Astro.url.pathname;
+const links = [
+  { href: '/', label: '首页' },
+  { href: '/blog', label: '文章' },
+  { href: '/tags', label: '标签' },
+  { href: '/about', label: '关于' },
+];
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
 ---
 
 <header>
@@ -11,10 +22,17 @@ import ThemeToggle from './ThemeToggle.astro';
     </a>
     <div class="nav-right">
       <div class="links">
-        <a href="/">首页</a>
-        <a href="/blog">文章</a>
-        <a href="/tags">标签</a>
-        <a href="/about">关于</a>
+        {
+          links.map((l) => (
+            <a
+              href={l.href}
+              class={isActive(l.href) ? 'active' : undefined}
+              aria-current={isActive(l.href) ? 'page' : undefined}
+            >
+              {l.label}
+            </a>
+          ))
+        }
       </div>
       <ThemeToggle />
     </div>
@@ -68,10 +86,19 @@ import ThemeToggle from './ThemeToggle.astro';
   .links a {
     color: var(--text-muted);
     font-size: 0.95rem;
+    padding-bottom: 2px;
+    border-bottom: 2px solid transparent;
+    transition: color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
   }
   .links a:hover {
     color: var(--link);
     text-decoration: none;
+  }
+  /* 当前所在页：品牌蓝下划线 + 主文本色（透明边框常驻，避免位移） */
+  .links a.active {
+    color: var(--text);
+    border-bottom-color: var(--brand);
   }
 
   /* 平板：收紧导航间距与内边距 */

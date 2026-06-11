@@ -54,24 +54,29 @@ const tags = [...counts.entries()].sort((a, b) => b[1] - a[1]);
   .tag-cloud a {
     display: inline-flex;
     align-items: center;
-    gap: 0.35em;
+    gap: 0.4em;
     background: var(--tag-bg);
     color: var(--tag-text);
-    padding: 0.35em 0.9em;
-    border-radius: 999px;
+    padding: 0.4em 0.95em;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
     font-size: 0.95rem;
+    transition: border-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
   }
   .tag-cloud a:hover {
     text-decoration: none;
-    opacity: 0.85;
+    border-color: var(--brand);
+    color: var(--link);
   }
   .num {
     background: var(--bg);
     color: var(--text-muted);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     padding: 0 0.5em;
     font-size: 0.8rem;
-    min-width: 1.4em;
+    min-width: 1.5em;
     text-align: center;
+    font-variant-numeric: tabular-nums;
   }
 </style>

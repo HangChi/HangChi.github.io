@@ -17,8 +17,12 @@ import Layout from '../layouts/Layout.astro';
   }
   .notfound h1 {
     font-size: 4rem;
-    margin: 0;
-    color: var(--text-muted);
+    margin: 0 0 0.5rem;
+    /* 品牌渐变数字，作为空页面上的克制点缀 */
+    background: linear-gradient(135deg, var(--brand-cyan), var(--brand));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   @media (max-width: 480px) {
     .notfound {

@@ -14,7 +14,7 @@ const { title, description, pubDate, updatedDate, heroImage, tags } =
   Astro.props;
 ---
 
-<Layout title={title} description={description} image={heroImage}>
+<Layout title={title} description={description} image={heroImage} wide>
   <article>
     {heroImage && <img class="hero" src={heroImage} alt="" />}
     <header class="post-header">
@@ -54,14 +54,29 @@ const { title, description, pubDate, updatedDate, heroImage, tags } =
   }
   .post-header h1 {
     margin: 0 0 0.5rem;
+    font-size: 2.2rem;
   }
   .meta {
     color: var(--text-muted);
-    font-size: 0.92rem;
+    font-size: var(--text-sm);
     margin-bottom: 0.6rem;
   }
   .updated {
     font-style: italic;
+  }
+
+  /* 正文：略大字号，配合加宽后的版心更耐读 */
+  .content {
+    font-size: 1.05rem;
+  }
+  /* 长技术文章：给 h2 一条淡分隔线，便于扫读分段 */
+  .content :global(h2) {
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--border);
+  }
+  /* 锚点跳转时，标题不被 sticky 顶栏遮挡 */
+  .content :global(:is(h1, h2, h3, h4)) {
+    scroll-margin-top: 5rem;
   }
 
   /* 文章正文里的宽表格：窄屏可横向滚动，不撑破版面 */
@@ -74,6 +89,12 @@ const { title, description, pubDate, updatedDate, heroImage, tags } =
 
   /* 文章页响应式 */
   @media (max-width: 768px) {
+    .post-header h1 {
+      font-size: 1.8rem;
+    }
+    .content {
+      font-size: 1.02rem;
+    }
     .hero {
       max-height: 240px;
       margin-bottom: 1.2rem;

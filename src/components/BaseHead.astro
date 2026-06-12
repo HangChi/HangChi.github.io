@@ -18,11 +18,9 @@ const { title, description, image = '/blog-placeholder-1.jpg' } = Astro.props;
 <!-- 全局元信息 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<link rel="icon" type="image/png" href="/logo.png" />
 <meta name="generator" content={Astro.generator} />
 
-<!-- 站点图标：优先矢量 SVG（清晰、自适应），PNG 作回退 -->
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<!-- 站点图标：与网站 Logo 一致（城堡）。浏览器标签页显示 logo.png -->
 <link rel="icon" type="image/png" href="/logo.png" />
 <link rel="apple-touch-icon" href="/logo.png" />
 

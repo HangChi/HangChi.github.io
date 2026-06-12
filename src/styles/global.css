@@ -342,14 +342,14 @@ li {
   padding: 0;
   margin: 0;
 }
-.post-list li {
+.post-list > li {
   display: grid;
   grid-template-columns: 6.5rem 1fr;
   gap: 0 var(--space-5);
-  padding: var(--space-5) 0;
+  padding: 1.15rem 0;
   border-bottom: 1px solid var(--border);
 }
-.post-list li:last-child {
+.post-list > li:last-child {
   border-bottom: none;
 }
 
@@ -408,7 +408,7 @@ li {
    - 手机 ≤ 480px：进一步缩小字号、收窄字间距
    ============================================================ */
 @media (max-width: 640px) {
-  .post-list li {
+  .post-list > li {
     grid-template-columns: 1fr;
     gap: var(--space-1) 0;
     padding: var(--space-4) 0;

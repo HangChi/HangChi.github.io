@@ -1,0 +1,110 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import {
+  CATEGORY_META,
+  CATEGORY_ORDER,
+  getCategoryPath,
+  getPostCategorySlug,
+  type CategorySlug,
+} from '../../utils/categories';
+
+const posts = (await getCollection('blog')).filter((p) => !p.data.draft);
+
+const counts = new Map<CategorySlug, number>(
+  CATEGORY_ORDER.map((slug) => [slug, 0])
+);
+
+for (const post of posts) {
+  const slug = getPostCategorySlug(post);
+  counts.set(slug, (counts.get(slug) ?? 0) + 1);
+}
+
+const categories = CATEGORY_ORDER.map((slug) => ({
+  ...CATEGORY_META[slug],
+  count: counts.get(slug) ?? 0,
+})).filter((category) => category.count > 0);
+---
+
+<Layout title="分类" description="按分类浏览全部文章" wide>
+  <h1>分类</h1>
+  <p class="count">共 {categories.length} 个分类</p>
+
+  {categories.length === 0 && <p class="empty">还没有任何分类。</p>}
+
+  <ul class="category-list">
+    {
+      categories.map((category) => (
+        <li>
+          <a href={getCategoryPath(category.slug)}>
+            <div>
+              <h2>{category.name}</h2>
+              <p>{category.description}</p>
+            </div>
+            <span>{category.count} 篇</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Layout>
+
+<style>
+  .count,
+  .empty {
+    color: var(--text-muted);
+    margin-top: -0.5rem;
+  }
+  .category-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0;
+  }
+  .category-list li {
+    margin: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .category-list li:last-child {
+    border-bottom: none;
+  }
+  .category-list a {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.15rem 0;
+    color: var(--text);
+  }
+  .category-list a:hover {
+    text-decoration: none;
+  }
+  .category-list h2 {
+    margin: 0 0 0.35rem;
+    font-size: var(--text-lg);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .category-list p {
+    margin: 0;
+    color: var(--text-muted);
+  }
+  .category-list span {
+    flex: 0 0 auto;
+    align-self: center;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+  }
+  .category-list a:hover h2 {
+    color: var(--link);
+  }
+
+  @media (max-width: 640px) {
+    .category-list a {
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .category-list span {
+      align-self: flex-start;
+    }
+  }
+</style>

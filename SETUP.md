@@ -1,6 +1,6 @@
 # 博客搭建与上线指南
 
-一个用 Astro 搭的个人技术博客，支持深色模式、标签分类、Giscus 评论、RSS、中文排版优化，自动部署到 GitHub Pages。
+一个用 Astro 搭的个人技术博客，支持深色模式、分类与标签、Giscus 评论、RSS、中文排版优化，自动部署到 GitHub Pages。
 
 ---
 
@@ -37,6 +37,7 @@ npm run preview  # 预览构建产物
 title: '文章标题'
 description: '一句话摘要（用于列表和 SEO）'
 pubDate: 2026-06-11
+category: 'blog'
 tags: ['标签1', '标签2']
 draft: false          # true = 草稿，不发布
 heroImage: '/xxx.jpg' # 可选，封面图
@@ -46,6 +47,7 @@ heroImage: '/xxx.jpg' # 可选，封面图
 ```
 
 - 文件名就是 URL：`my-post.md` → `/blog/my-post/`
+- `category` 会自动生成 `/categories/<分类>` 聚合页；不填时按目录推断
 - `draft: true` 的文章不会出现在列表、标签页和 RSS 里
 - 标签会自动生成 `/tags/<标签>` 聚合页
 
@@ -129,6 +131,8 @@ git push -u origin main
 | 功能 | 位置 |
 | --- | --- |
 | 深色模式切换 | 右上角按钮，记忆在 localStorage，跟随系统默认 |
+| 分类总览 | `/categories` |
+| 单分类文章 | `/categories/<分类>` |
 | 标签总览 | `/tags` |
 | 单标签文章 | `/tags/<标签>` |
 | RSS | `/rss.xml` |
@@ -144,7 +148,7 @@ src/
 ├── components/      # 可复用组件（Header/Footer/主题切换/评论/标签/日期）
 ├── content/blog/    # ← 你的文章放这里
 ├── layouts/         # 页面与文章布局
-├── pages/           # 路由（首页/列表/详情/标签/关于/RSS/404）
+├── pages/           # 路由（首页/列表/详情/分类/标签/关于/RSS/404）
 ├── styles/          # 全局样式 + 深色模式变量
 ├── consts.ts        # 站点常量（标题/作者）
 └── content.config.ts# 文章集合 schema

@@ -5,16 +5,13 @@ import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
 import TagList from '../../components/TagList.astro';
+import { comparePostsByPriority } from '../../utils/categories';
 
 // 分页：第一页为 /blog，后续为 /blog/2、/blog/3……
 export const getStaticPaths = (async ({ paginate }) => {
   const posts = (await getCollection('blog'))
     .filter((p) => !p.data.draft)
-    .sort((a, b) => {
-      // 置顶优先，再按发布日期降序
-      if (!!a.data.pinned !== !!b.data.pinned) return a.data.pinned ? -1 : 1;
-      return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
-    });
+    .sort(comparePostsByPriority);
   return paginate(posts, { pageSize: 12 });
 }) satisfies GetStaticPaths;
 

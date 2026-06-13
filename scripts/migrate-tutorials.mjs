@@ -97,6 +97,7 @@ function convert(file) {
     `title: ${yamlStr(title)}`,
     `description: ${yamlStr(description)}`,
     `pubDate: ${formatDate(mtime)}`,
+    `category: ${yamlStr('tutorials')}`,
     `tags: [${yamlStr(UNIFIED_TAG)}]`,
     '---',
     '',

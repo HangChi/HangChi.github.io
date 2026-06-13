@@ -14,15 +14,8 @@
   大色块、焦点环、悬停下划线等「≥3:1 即可」的装饰位，正文链接用更深的蓝。
 */
 
-/* ===== 字体（自托管，无外部请求）===== */
-/* 中文正文：思源黑体 Noto Sans SC */
-@import '@fontsource/noto-sans-sc/400.css';
-@import '@fontsource/noto-sans-sc/500.css';
-@import '@fontsource/noto-sans-sc/700.css';
-/* 代码 / 日期 / 元信息：JetBrains Mono —— 开发者气质 */
-@import '@fontsource/jetbrains-mono/400.css';
-@import '@fontsource/jetbrains-mono/500.css';
-@import '@fontsource/jetbrains-mono/700.css';
+/* ===== 字体 ===== */
+/* 首屏使用系统字体，避免网页字体加载完成后引发布局重排。 */
 
 /* ============================================================
    设计令牌 · 与主题无关的尺度
@@ -81,10 +74,10 @@
   --width-wide: 1000px;
 
   /* —— 字体族 —— */
-  --font-sans: 'Noto Sans SC', system-ui, -apple-system, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
-    Consolas, 'Liberation Mono', monospace;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    'Liberation Mono', monospace;
 }
 
 /* ============================================================
@@ -169,7 +162,7 @@ body {
   font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: var(--leading-relaxed);
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   background: var(--bg);
   color: var(--text);
   transition: background-color var(--dur-base) var(--ease-in-out),
@@ -194,7 +187,7 @@ h1, h2, h3, h4, h5, h6 {
   line-height: var(--leading-tight);
   font-weight: var(--fw-bold);
   margin: 1.6em 0 0.6em;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 h1 { font-size: var(--text-2xl); }
 h2 { font-size: var(--text-xl); }
@@ -370,7 +363,7 @@ li {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   font-weight: var(--fw-medium);
-  letter-spacing: 0.05em;
+  letter-spacing: 0;
   color: var(--tag-text);
   background: var(--tag-bg);
   border-radius: var(--radius-sm);
@@ -448,8 +441,7 @@ li {
   }
   h1 { font-size: 1.5rem; }
   body {
-    /* 手机上略微收窄字间距，避免中文行过满 */
-    letter-spacing: 0.01em;
+    letter-spacing: 0;
   }
 }
 

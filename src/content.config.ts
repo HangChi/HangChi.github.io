@@ -11,6 +11,8 @@ const blog = defineCollection({
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     heroImage: z.string().optional(),
+    // 一级分类：用于 /categories 聚合页；老文章可省略，由路径自动推断。
+    category: z.string().optional(),
     // 标签系统：可选的字符串数组，缺省为空。
     tags: z.array(z.string()).default([]),
     // 草稿标记：为 true 时不在列表/RSS 中展示。

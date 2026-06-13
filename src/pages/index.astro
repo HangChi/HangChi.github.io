@@ -4,14 +4,12 @@ import Layout from '../layouts/Layout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import TagList from '../components/TagList.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { comparePostsByPriority } from '../utils/categories';
 
 // 取所有非草稿文章：置顶优先，再按发布日期降序，首页展示最近 9 篇。
 const posts = (await getCollection('blog'))
   .filter((p) => !p.data.draft)
-  .sort((a, b) => {
-    if (!!a.data.pinned !== !!b.data.pinned) return a.data.pinned ? -1 : 1;
-    return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
-  });
+  .sort(comparePostsByPriority);
 
 const recent = posts.slice(0, 9);
 ---
@@ -60,7 +58,7 @@ const recent = posts.slice(0, 9);
   .hero h1 {
     margin: 0 0 0.5rem;
     font-size: 2.5rem;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
     color: var(--text);
   }
   .hero p {

@@ -1,36 +1,51 @@
 ---
+import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
 import TagList from '../../components/TagList.astro';
-import { comparePostsByPriority } from '../../utils/categories';
+import {
+  CATEGORY_META,
+  CATEGORY_ORDER,
+  comparePostsByPriority,
+  getPostCategorySlug,
+  type CategoryInfo,
+} from '../../utils/categories';
 
-// 为每个标签生成一个聚合页。
+type BlogPost = CollectionEntry<'blog'>;
+
 export async function getStaticPaths() {
   const posts = (await getCollection('blog')).filter((p) => !p.data.draft);
 
-  const tagSet = new Set<string>();
-  for (const post of posts) {
-    for (const tag of post.data.tags) tagSet.add(tag);
-  }
-
-  return [...tagSet].map((tag) => {
+  return CATEGORY_ORDER.map((slug) => {
     const filtered = posts
-      .filter((p) => p.data.tags.includes(tag))
+      .filter((post) => getPostCategorySlug(post) === slug)
       .sort(comparePostsByPriority);
+
     return {
-      params: { tag },
-      props: { tag, posts: filtered },
+      params: { category: slug },
+      props: {
+        category: CATEGORY_META[slug],
+        posts: filtered,
+      },
     };
-  });
+  }).filter(({ props }) => props.posts.length > 0);
 }
 
-const { tag, posts } = Astro.props;
+const { category, posts } = Astro.props as {
+  category: CategoryInfo;
+  posts: BlogPost[];
+};
 ---
 
-<Layout title={`标签：${tag}`} description={`标签 ${tag} 下的全部文章`} wide>
-  <p class="back"><a href="/tags">← 所有标签</a></p>
-  <h1>#{tag}</h1>
+<Layout
+  title={`分类：${category.name}`}
+  description={`${category.name} 下的全部文章`}
+  wide
+>
+  <p class="back"><a href="/categories">← 所有分类</a></p>
+  <h1>{category.name}</h1>
+  <p class="description">{category.description}</p>
   <p class="count">共 {posts.length} 篇文章</p>
 
   <ul class="post-list">
@@ -38,6 +53,7 @@ const { tag, posts } = Astro.props;
       posts.map((post) => (
         <li>
           <div class="post-date">
+            {post.data.pinned && <span class="pin-flag">置顶</span>}
             <FormattedDate date={post.data.pubDate} compact />
           </div>
           <div class="post-body">
@@ -58,9 +74,13 @@ const { tag, posts } = Astro.props;
     color: var(--text-muted);
     font-size: 0.9rem;
   }
+  .description {
+    color: var(--text-muted);
+    margin: -0.3rem 0 0.2rem;
+  }
   .count {
     color: var(--text-muted);
-    margin-top: -0.5rem;
+    margin-top: 0;
   }
   .post-list {
     margin-top: 1.5rem;

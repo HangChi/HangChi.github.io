@@ -39,6 +39,60 @@ const { title, description, image = '/blog-placeholder-1.jpg' } = Astro.props;
   href={new URL('rss.xml', Astro.site)}
 />
 
+<style is:inline>
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
+      Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  }
+  header {
+    min-height: 62px;
+  }
+  header nav {
+    max-width: 1000px;
+    min-height: 62px;
+    margin: 0 auto;
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-family: system-ui, -apple-system, 'Segoe UI', 'Microsoft YaHei',
+      sans-serif;
+  }
+  .site-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+  .site-title .logo {
+    flex-shrink: 0;
+    display: block;
+  }
+  .nav-right,
+  .links {
+    display: flex;
+    align-items: center;
+  }
+  .nav-right {
+    gap: 1rem;
+    flex: 0 0 auto;
+  }
+  .links {
+    gap: 1rem;
+  }
+  #theme-toggle {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+</style>
+
 <!-- 主 SEO 标签 -->
 <title>{title}</title>
 <meta name="title" content={title} />

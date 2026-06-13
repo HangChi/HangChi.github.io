@@ -135,6 +135,15 @@ const { title, description, image = '/blog-placeholder-1.jpg' } = Astro.props;
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image, Astro.url)} />
 
+<!-- Umami analytics -->
+<script
+  is:inline
+  defer
+  src="https://cloud.umami.is/script.js"
+  data-website-id="18759d9a-2b0b-469e-b11b-394c4738fb18"
+  data-domains="hangchi.github.io"
+></script>
+
 <!--
   防闪烁主题脚本：is:inline 确保原样内联、最先执行。
   优先级：localStorage 用户选择 > 系统偏好。

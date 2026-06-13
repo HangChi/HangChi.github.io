@@ -11,6 +11,16 @@ export const CATEGORY_META = {
     name: '部署教程',
     description: '服务部署与工具使用记录',
   },
+  tools: {
+    slug: 'tools',
+    name: '实用工具',
+    description: '开发工具、工具类与效率实践记录',
+  },
+  agent: {
+    slug: 'agent',
+    name: 'Agent 相关',
+    description: 'AI Agent、Claude Code、Skills 与自动化工作流',
+  },
   blog: {
     slug: 'blog',
     name: '博客建站',
@@ -25,6 +35,8 @@ export type BlogPostEntry = CollectionEntry<'blog'>;
 export const CATEGORY_ORDER = [
   'leetcode',
   'tutorials',
+  'tools',
+  'agent',
   'blog',
 ] as const satisfies readonly CategorySlug[];
 
@@ -53,6 +65,8 @@ function normalizeCategory(value: string) {
 function inferCategoryFromPath(id: string): CategorySlug {
   if (id.startsWith('leetcode/')) return 'leetcode';
   if (id.startsWith('tutorials/')) return 'tutorials';
+  if (id.startsWith('tools/')) return 'tools';
+  if (id.startsWith('agent/')) return 'agent';
   return 'blog';
 }
 

@@ -79,21 +79,18 @@ const hasToc = tocHeadings.length > 0;
     grid-template-columns: minmax(0, var(--width-content));
     justify-content: center;
   }
-  .post-layout.has-toc {
-    grid-template-columns: 11rem minmax(0, var(--width-content));
-    gap: var(--space-6);
-    align-items: start;
-  }
   .post-main {
     min-width: 0;
     width: 100%;
   }
   .toc {
-    position: sticky;
+    position: fixed;
     top: 5.5rem;
-    max-height: calc(100vh - 7rem);
+    bottom: var(--space-6);
+    left: var(--space-4);
+    width: 13rem;
     overflow-y: auto;
-    padding-top: 0.15rem;
+    padding: 0.15rem var(--space-2) 0 0;
     font-size: var(--text-sm);
   }
   .toc-title {
@@ -184,10 +181,7 @@ const hasToc = tocHeadings.length > 0;
     white-space: nowrap;
   }
 
-  @media (max-width: 1024px) {
-    .post-layout.has-toc {
-      grid-template-columns: minmax(0, var(--width-content));
-    }
+  @media (max-width: 1200px) {
     .toc {
       display: none;
     }

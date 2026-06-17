@@ -15,9 +15,9 @@ type Props = CollectionEntry<'blog'>;
 
 const post = Astro.props;
 // Astro 6：用 render(entry) 而非 entry.render()
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 ---
 
-<BlogPost {...post.data}>
+<BlogPost {...post.data} headings={headings}>
   <Content />
 </BlogPost>

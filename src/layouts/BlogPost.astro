@@ -1,5 +1,6 @@
 ---
 // 文章详情布局：标题、元信息、标签、正文、评论。
+import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import Layout from './Layout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
@@ -8,39 +9,135 @@ import Comments from '../components/Comments.astro';
 // KaTeX 数学公式样式（题解里的 $O(n)$ 等公式渲染所需）
 import 'katex/dist/katex.min.css';
 
-type Props = CollectionEntry<'blog'>['data'];
+type Props = CollectionEntry<'blog'>['data'] & {
+  headings?: MarkdownHeading[];
+};
 
-const { title, description, pubDate, updatedDate, heroImage, tags } =
+const { title, description, pubDate, updatedDate, heroImage, tags, headings = [] } =
   Astro.props;
+
+const tocHeadings = headings.filter(
+  ({ depth, text }) =>
+    depth >= 1 &&
+    depth <= 4 &&
+    !(depth === 1 && text.trim() === title.trim())
+);
+const hasToc = tocHeadings.length > 0;
 ---
 
 <Layout title={title} description={description} image={heroImage} wide>
-  <article>
-    {heroImage && <img class="hero" src={heroImage} alt="" />}
-    <header class="post-header">
-      <h1>{title}</h1>
-      <div class="meta">
-        <FormattedDate date={pubDate} />
-        {
-          updatedDate && (
-            <span class="updated">
-              （更新于 <FormattedDate date={updatedDate} />）
-            </span>
-          )
-        }
+  <div class:list={['post-layout', { 'has-toc': hasToc }]}>
+    {
+      hasToc && (
+        <aside class="toc" aria-label="文章目录">
+          <div class="toc-title">文章目录</div>
+          <ol class="toc-list">
+            {tocHeadings.map((heading) => (
+              <li class="toc-item">
+                <a
+                  class={`toc-link depth-${heading.depth}`}
+                  href={`#${heading.slug}`}
+                >
+                  {heading.text}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </aside>
+      )
+    }
+
+    <article class="post-main">
+      {heroImage && <img class="hero" src={heroImage} alt="" />}
+      <header class="post-header">
+        <h1>{title}</h1>
+        <div class="meta">
+          <FormattedDate date={pubDate} />
+          {
+            updatedDate && (
+              <span class="updated">
+                （更新于 <FormattedDate date={updatedDate} />）
+              </span>
+            )
+          }
+        </div>
+        <TagList tags={tags} />
+      </header>
+
+      <div class="content">
+        <slot />
       </div>
-      <TagList tags={tags} />
-    </header>
 
-    <div class="content">
-      <slot />
-    </div>
-
-    <Comments />
-  </article>
+      <Comments />
+    </article>
+  </div>
 </Layout>
 
 <style>
+  .post-layout {
+    display: grid;
+    grid-template-columns: minmax(0, var(--width-content));
+    justify-content: center;
+  }
+  .post-layout.has-toc {
+    grid-template-columns: 11rem minmax(0, var(--width-content));
+    gap: var(--space-6);
+    align-items: start;
+  }
+  .post-main {
+    min-width: 0;
+    width: 100%;
+  }
+  .toc {
+    position: sticky;
+    top: 5.5rem;
+    max-height: calc(100vh - 7rem);
+    overflow-y: auto;
+    padding-top: 0.15rem;
+    font-size: var(--text-sm);
+  }
+  .toc-title {
+    margin-bottom: 0.7rem;
+    color: var(--text);
+    font-weight: var(--fw-bold);
+    line-height: var(--leading-tight);
+  }
+  .toc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 1px solid var(--border);
+  }
+  .toc-item {
+    margin: 0;
+  }
+  .toc-link {
+    display: block;
+    margin-left: -1px;
+    padding: 0.32rem 0 0.32rem 0.8rem;
+    border-left: 2px solid transparent;
+    color: var(--text-muted);
+    line-height: var(--leading-snug);
+    overflow-wrap: anywhere;
+  }
+  .toc-link:hover,
+  .toc-link:focus-visible {
+    border-left-color: var(--brand);
+    color: var(--link);
+    text-decoration: none;
+  }
+  .toc-link.depth-1 {
+    color: var(--text);
+    font-weight: var(--fw-medium);
+  }
+  .toc-link.depth-3 {
+    padding-left: 1.4rem;
+    font-size: 0.94em;
+  }
+  .toc-link.depth-4 {
+    padding-left: 2rem;
+    font-size: 0.9em;
+  }
   .hero {
     width: 100%;
     max-height: 360px;
@@ -85,6 +182,15 @@ const { title, description, pubDate, updatedDate, heroImage, tags } =
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     white-space: nowrap;
+  }
+
+  @media (max-width: 1024px) {
+    .post-layout.has-toc {
+      grid-template-columns: minmax(0, var(--width-content));
+    }
+    .toc {
+      display: none;
+    }
   }
 
   /* 文章页响应式 */

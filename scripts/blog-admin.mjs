@@ -470,6 +470,17 @@ const html = String.raw`<!doctype html>
         outline: none;
       }
 
+      .folder-row {
+        display: grid;
+        grid-template-columns: minmax(160px, 0.7fr) minmax(0, 1fr);
+        gap: 10px;
+      }
+
+      .field-hint {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
       textarea {
         min-height: 360px;
         resize: vertical;
@@ -665,6 +676,10 @@ const html = String.raw`<!doctype html>
         .grid {
           grid-template-columns: 1fr;
         }
+
+        .folder-row {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
@@ -714,11 +729,15 @@ const html = String.raw`<!doctype html>
               <option value=".mdx">.mdx</option>
             </select>
           </label>
-          <label>
+          <label class="span-2">
             保存目录
-            <select id="folder">
-              <option value="">根目录</option>
-            </select>
+            <div class="folder-row">
+              <select id="folder" aria-label="选择已有目录">
+                <option value="">根目录</option>
+              </select>
+              <input id="customFolder" aria-label="输入新目录" placeholder="新目录，如 notes/ai" />
+            </div>
+            <span class="field-hint">填写新目录时会优先保存到新目录，支持多级目录。</span>
           </label>
           <label>
             分类
@@ -782,6 +801,7 @@ const html = String.raw`<!doctype html>
         pubDate: $('pubDate'),
         extension: $('extension'),
         folder: $('folder'),
+        customFolder: $('customFolder'),
         category: $('category'),
         tags: $('tags'),
         markdown: $('markdown'),
@@ -813,6 +833,27 @@ const html = String.raw`<!doctype html>
           .replace(/\s+/g, '-')
           .replace(/-+/g, '-')
           .replace(/^-|-$/g, '') || 'untitled';
+      }
+
+      function sanitizeFolderSegment(value) {
+        return String(value || '')
+          .trim()
+          .replace(/[\\/:*?"<>|#]+/g, '-')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+      }
+
+      function normalizeFolder(value) {
+        return String(value || '')
+          .split(/[\\/]+/)
+          .map((part) => sanitizeFolderSegment(part))
+          .filter(Boolean)
+          .join('/');
+      }
+
+      function selectedFolder() {
+        return normalizeFolder(fields.customFolder.value.trim() || fields.folder.value);
       }
 
       function splitFrontmatter(markdown) {
@@ -881,9 +922,9 @@ const html = String.raw`<!doctype html>
       }
 
       function updatePath() {
-        const folder = fields.folder.value ? fields.folder.value + '/' : '';
+        const folder = selectedFolder();
         const slug = slugify(fields.slug.value || fields.title.value);
-        fields.path.textContent = '将保存到：src/content/blog/' + folder + slug + fields.extension.value;
+        fields.path.textContent = '将保存到：src/content/blog/' + (folder ? folder + '/' : '') + slug + fields.extension.value;
       }
 
       function writeLog(message, isError = false) {
@@ -928,7 +969,7 @@ const html = String.raw`<!doctype html>
           description: fields.description.value.trim(),
           pubDate: fields.pubDate.value,
           extension: fields.extension.value,
-          folder: fields.folder.value,
+          folder: selectedFolder(),
           category: fields.category.value.trim(),
           tags: fields.tags.value.split(',').map((tag) => tag.trim()).filter(Boolean),
           markdown: fields.markdown.value,
@@ -994,10 +1035,14 @@ const html = String.raw`<!doctype html>
         if (file) await readFile(file);
       });
 
-      for (const field of [fields.title, fields.slug, fields.folder, fields.extension]) {
+      for (const field of [fields.title, fields.slug, fields.folder, fields.customFolder, fields.extension]) {
         field.addEventListener('input', updatePath);
         field.addEventListener('change', updatePath);
       }
+      fields.folder.addEventListener('change', () => {
+        fields.customFolder.value = '';
+        updatePath();
+      });
       fields.title.addEventListener('input', () => {
         if (!fields.slug.value.trim()) fields.slug.value = slugify(fields.title.value);
         if (!fields.commitMessage.value.trim()) fields.commitMessage.value = 'post: ' + fields.title.value.trim();
@@ -1011,6 +1056,7 @@ const html = String.raw`<!doctype html>
         fields.title.value = '';
         fields.slug.value = '';
         fields.description.value = '';
+        fields.customFolder.value = '';
         fields.category.value = '';
         fields.tags.value = '';
         fields.markdown.value = '';

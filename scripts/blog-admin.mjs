@@ -354,11 +354,12 @@ const html = String.raw`<!doctype html>
 
       .shell {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 360px;
+        grid-template-columns: minmax(620px, 1fr) clamp(320px, 28vw, 400px);
         gap: 18px;
-        width: min(1180px, calc(100% - 32px));
+        width: min(1380px, calc(100% - 32px));
         margin: 0 auto;
         padding: 24px 0;
+        align-items: start;
       }
 
       header {
@@ -401,12 +402,18 @@ const html = String.raw`<!doctype html>
 
       .main {
         padding: 18px;
+        align-self: start;
       }
 
       .side {
-        display: flex;
-        flex-direction: column;
+        position: sticky;
+        top: 16px;
+        display: grid;
+        grid-template-rows: minmax(220px, 34vh) minmax(240px, 1fr);
         gap: 14px;
+        height: calc(100vh - 128px);
+        min-height: 560px;
+        align-self: start;
       }
 
       .section-title {
@@ -557,6 +564,9 @@ const html = String.raw`<!doctype html>
       }
 
       .card {
+        display: flex;
+        min-height: 0;
+        flex-direction: column;
         padding: 14px;
       }
 
@@ -566,6 +576,8 @@ const html = String.raw`<!doctype html>
         margin: 0;
         padding: 0;
         list-style: none;
+        overflow: auto;
+        padding-right: 4px;
       }
 
       .post {
@@ -597,7 +609,8 @@ const html = String.raw`<!doctype html>
       }
 
       pre {
-        max-height: 320px;
+        flex: 1;
+        min-height: 0;
         overflow: auto;
         margin: 0;
         border: 1px solid var(--line);
@@ -618,6 +631,21 @@ const html = String.raw`<!doctype html>
           grid-template-columns: 1fr;
         }
 
+        .side {
+          position: static;
+          grid-template-rows: auto auto;
+          height: auto;
+          min-height: 0;
+        }
+
+        .post-list {
+          max-height: 360px;
+        }
+
+        pre {
+          min-height: 220px;
+        }
+
         header {
           align-items: stretch;
           flex-direction: column;
@@ -630,7 +658,7 @@ const html = String.raw`<!doctype html>
 
       @media (max-width: 640px) {
         .shell {
-          width: min(100% - 20px, 1180px);
+          width: min(100% - 20px, 1380px);
           padding: 12px 0;
         }
 
@@ -729,12 +757,12 @@ const html = String.raw`<!doctype html>
 
       <aside class="side">
         <section class="panel card">
-          <h2 class="section-title">最近文章</h2>
-          <ul id="posts" class="post-list"></ul>
-        </section>
-        <section class="panel card">
           <h2 class="section-title">执行日志</h2>
           <pre id="log">等待操作</pre>
+        </section>
+        <section class="panel card">
+          <h2 class="section-title">最近文章</h2>
+          <ul id="posts" class="post-list"></ul>
         </section>
       </aside>
     </div>
@@ -858,6 +886,14 @@ const html = String.raw`<!doctype html>
         fields.path.textContent = '将保存到：src/content/blog/' + folder + slug + fields.extension.value;
       }
 
+      function writeLog(message, isError = false) {
+        fields.log.classList.toggle('error', isError);
+        fields.log.textContent = message;
+        requestAnimationFrame(() => {
+          fields.log.scrollTop = fields.log.scrollHeight;
+        });
+      }
+
       function setBusy(isBusy) {
         for (const id of ['publish', 'build', 'save', 'clear']) {
           $(id).disabled = isBusy;
@@ -905,11 +941,11 @@ const html = String.raw`<!doctype html>
 
       async function submit(mode) {
         setBusy(true);
-        fields.log.textContent = mode === 'publish'
+        writeLog(mode === 'publish'
           ? '正在保存、构建、提交并推送...'
           : mode === 'build'
             ? '正在保存并构建...'
-            : '正在保存...';
+            : '正在保存...');
 
         try {
           const response = await fetch('/api/publish', {
@@ -920,12 +956,10 @@ const html = String.raw`<!doctype html>
           const data = await response.json();
           if (!data.ok) throw new Error(data.error || '操作失败');
 
-          fields.log.classList.remove('error');
-          fields.log.textContent = data.logs.join('\n\n');
+          writeLog(data.logs.join('\n\n'));
           await loadPosts();
         } catch (error) {
-          fields.log.classList.add('error');
-          fields.log.textContent = error.message || String(error);
+          writeLog(error.message || String(error), true);
         } finally {
           setBusy(false);
         }
@@ -992,8 +1026,7 @@ const html = String.raw`<!doctype html>
         .then(updatePath)
         .catch((error) => {
           fields.status.textContent = '后台连接异常';
-          fields.log.classList.add('error');
-          fields.log.textContent = error.message || String(error);
+          writeLog(error.message || String(error), true);
         });
     </script>
   </body>

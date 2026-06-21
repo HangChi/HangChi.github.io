@@ -1,14 +1,30 @@
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
 import { existsSync } from 'node:fs';
-import { mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
 const contentRoot = path.join(rootDir, 'src', 'content', 'blog');
+const publicRoot = path.join(rootDir, 'public');
+const uploadedImageRoot = path.join(publicRoot, 'blog-assets');
 const defaultPort = Number.parseInt(process.env.BLOG_ADMIN_PORT || '8787', 10);
+const maxJsonBytes = 100 * 1024 * 1024;
+const maxImageBytes = 25 * 1024 * 1024;
+const imageExtensionByMime = new Map([
+  ['image/avif', '.avif'],
+  ['image/bmp', '.bmp'],
+  ['image/gif', '.gif'],
+  ['image/jpeg', '.jpg'],
+  ['image/jpg', '.jpg'],
+  ['image/png', '.png'],
+  ['image/svg+xml', '.svg'],
+  ['image/webp', '.webp'],
+  ['image/x-icon', '.ico'],
+]);
+const imageExtensions = new Set([...imageExtensionByMime.values(), '.jpeg']);
 
 const portArg = process.argv.find((arg) => arg.startsWith('--port='));
 const requestedPort = portArg ? Number.parseInt(portArg.slice('--port='.length), 10) : defaultPort;
@@ -40,8 +56,8 @@ async function readJson(req) {
   let size = 0;
   for await (const chunk of req) {
     size += chunk.length;
-    if (size > 10 * 1024 * 1024) {
-      throw new Error('Markdown is larger than 10MB.');
+    if (size > maxJsonBytes) {
+      throw new Error(`Upload payload is larger than ${Math.round(maxJsonBytes / 1024 / 1024)}MB.`);
     }
     chunks.push(chunk);
   }
@@ -92,6 +108,7 @@ function normalizeTargetPath(folder, slug, extension) {
   return {
     targetDir,
     targetFile,
+    safeSlug,
     relativePath: toPosix(path.relative(rootDir, targetFile)),
   };
 }
@@ -104,6 +121,175 @@ function stripFrontmatter(markdown) {
   const normalized = String(markdown || '').replace(/^\uFEFF/, '');
   const match = normalized.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/);
   return match ? normalized.slice(match[0].length).trimStart() : normalized.trimStart();
+}
+
+function parseMarkdownImageTarget(target) {
+  const value = String(target || '').trim();
+  const bracketed = value.match(/^<([^>]+)>(.*)$/);
+  if (bracketed) {
+    return { url: bracketed[1].trim(), suffix: bracketed[2] || '' };
+  }
+
+  const titled = value.match(/^(.*?)(\s+(?:"[^"]*"|'[^']*'|\([^)]*\)))$/);
+  if (titled?.[1]?.trim()) {
+    return { url: titled[1].trim(), suffix: titled[2] };
+  }
+
+  return { url: value, suffix: '' };
+}
+
+function localImagePathFromUrl(url) {
+  const original = String(url || '').trim();
+  if (!original) return { type: 'skip' };
+  if (original.startsWith('#') || /^data:/i.test(original)) return { type: 'skip' };
+
+  if (/^file:\/\//i.test(original)) {
+    try {
+      return { type: 'local', filePath: fileURLToPath(original) };
+    } catch {
+      return { type: 'unreadable', value: original };
+    }
+  }
+
+  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(original)) return { type: 'skip' };
+  if (original.startsWith('/')) return { type: 'skip' };
+
+  const cleaned = original.split('#')[0].split('?')[0];
+  let decoded = cleaned;
+  try {
+    decoded = decodeURIComponent(cleaned);
+  } catch {
+    // Some local exporters emit partially escaped paths. Keep the original.
+  }
+
+  if (path.isAbsolute(decoded) || path.win32.isAbsolute(decoded)) {
+    return { type: 'local', filePath: path.normalize(decoded) };
+  }
+
+  return { type: 'relative', value: original };
+}
+
+function imageExtensionFromPath(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  if (imageExtensions.has(ext)) return ext;
+  return '';
+}
+
+function safeAssetFileName(filePath, usedNames) {
+  const ext = imageExtensionFromPath(filePath);
+  if (!ext) throw new Error(`Unsupported image type: ${filePath}`);
+
+  const rawName = path.basename(filePath) || 'image';
+  const rawBase = rawName.replace(/\.[^.]+$/, '');
+  const base = sanitizeSegment(rawBase, 'image');
+  let fileName = `${base}${ext}`;
+  let suffix = 2;
+
+  while (usedNames.has(fileName.toLowerCase())) {
+    fileName = `${base}-${suffix}${ext}`;
+    suffix += 1;
+  }
+
+  usedNames.add(fileName.toLowerCase());
+  return fileName;
+}
+
+function collectImageReferences(markdown) {
+  const refs = new Set();
+  String(markdown || '')
+    .replace(/!\[([^\]]*)\]\(([^)\n]+)\)/g, (_match, _alt, target) => {
+      refs.add(parseMarkdownImageTarget(target).url);
+      return _match;
+    })
+    .replace(/<img\b[^>]*?\bsrc\s*=\s*(["'])([^"']+)\1/gi, (_match, _quote, url) => {
+      refs.add(url);
+      return _match;
+    });
+  return [...refs];
+}
+
+async function prepareImageAssets(payload, safeSlug, logs) {
+  const rawMarkdown = String(payload.markdown || '');
+  const refs = collectImageReferences(rawMarkdown);
+  if (!refs.length) return { markdown: payload.markdown, files: [] };
+
+  const usedNames = new Set();
+  const replacements = new Map();
+  const files = [];
+  const unresolvedRelative = [];
+  const missing = [];
+  const unreadable = [];
+
+  for (const ref of refs) {
+    const resolved = localImagePathFromUrl(ref);
+    if (resolved.type === 'skip') continue;
+    if (resolved.type === 'relative') {
+      unresolvedRelative.push(ref);
+      continue;
+    }
+    if (resolved.type === 'unreadable') {
+      unreadable.push(ref);
+      continue;
+    }
+
+    const sourceFile = resolved.filePath;
+    try {
+      const fileStat = await stat(sourceFile);
+      if (!fileStat.isFile()) {
+        missing.push(ref);
+        continue;
+      }
+      if (fileStat.size > maxImageBytes) {
+        throw new Error(
+          `Image is larger than ${Math.round(maxImageBytes / 1024 / 1024)}MB: ${sourceFile}`
+        );
+      }
+
+      const fileName = safeAssetFileName(sourceFile, usedNames);
+      const targetFile = path.join(uploadedImageRoot, safeSlug, fileName);
+      const relativePath = toPosix(path.relative(rootDir, targetFile));
+      const publicUrl = `/blog-assets/${safeSlug}/${fileName}`;
+      replacements.set(ref, publicUrl);
+      files.push({ publicUrl, relativePath, sourceFile, targetFile });
+    } catch (error) {
+      if (error?.code === 'ENOENT' || error?.code === 'ENOTDIR') {
+        missing.push(ref);
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  const markdown = rawMarkdown
+    .replace(/!\[([^\]]*)\]\(([^)\n]+)\)/g, (match, alt, target) => {
+      const { url, suffix } = parseMarkdownImageTarget(target);
+      const replacement = replacements.get(url);
+      return replacement ? `![${alt}](${replacement}${suffix})` : match;
+    })
+    .replace(/(<img\b[^>]*?\bsrc\s*=\s*)(["'])([^"']+)\2/gi, (match, prefix, quote, url) => {
+      const replacement = replacements.get(url);
+      return replacement ? `${prefix}${quote}${replacement}${quote}` : match;
+    });
+
+  if (files.length) {
+    logs.push(`Copied ${files.length} local image${files.length === 1 ? '' : 's'}.`);
+  }
+  if (unreadable.length) {
+    const sample = unreadable.slice(0, 6).join(', ');
+    logs.push(`Unreadable local image URLs: ${sample}${unreadable.length > 6 ? '...' : ''}`);
+  }
+  if (missing.length) {
+    const sample = missing.slice(0, 6).join(', ');
+    logs.push(`Local image files not found: ${sample}${missing.length > 6 ? '...' : ''}`);
+  }
+  if (unresolvedRelative.length) {
+    const sample = unresolvedRelative.slice(0, 6).join(', ');
+    logs.push(
+      `Relative local image paths cannot be resolved from a single uploaded Markdown file: ${sample}${unresolvedRelative.length > 6 ? '...' : ''}`
+    );
+  }
+
+  return { markdown, files };
 }
 
 function buildMarkdown(payload) {
@@ -249,9 +435,10 @@ async function runBuild(logs) {
 
 async function publishPost(payload) {
   const extension = payload.extension === '.mdx' ? '.mdx' : '.md';
-  const { targetDir, targetFile, relativePath } = normalizeTargetPath(payload.folder, payload.slug, extension);
-  const markdown = buildMarkdown(payload);
+  const { targetDir, targetFile, safeSlug, relativePath } = normalizeTargetPath(payload.folder, payload.slug, extension);
   const logs = [];
+  const imageAssets = await prepareImageAssets(payload, safeSlug, logs);
+  const markdown = buildMarkdown({ ...payload, markdown: imageAssets.markdown });
 
   if (existsSync(targetFile) && !payload.overwrite) {
     throw new Error(`File already exists: ${relativePath}`);
@@ -260,6 +447,17 @@ async function publishPost(payload) {
   await mkdir(targetDir, { recursive: true });
   await writeFile(targetFile, markdown, 'utf8');
   logs.push(`Saved ${relativePath}`);
+
+  for (const image of imageAssets.files) {
+    const resolved = path.resolve(image.targetFile);
+    const resolvedRoot = path.resolve(uploadedImageRoot);
+    if (!resolved.startsWith(resolvedRoot + path.sep)) {
+      throw new Error('Image target path escapes the upload directory.');
+    }
+    await mkdir(path.dirname(image.targetFile), { recursive: true });
+    await copyFile(image.sourceFile, image.targetFile);
+    logs.push(`Saved ${image.relativePath}`);
+  }
 
   if (payload.mode === 'save') {
     return { relativePath, logs };
@@ -272,8 +470,9 @@ async function publishPost(payload) {
   }
 
   const message = String(payload.commitMessage || '').trim() || `post: ${payload.title}`;
-  await checkedRun(logs, 'Git add', 'git', ['add', '--', relativePath], { shell: false });
-  await checkedRun(logs, 'Git commit', 'git', ['commit', '-m', message, '--', relativePath], { shell: false });
+  const pathsToCommit = [relativePath, ...imageAssets.files.map((image) => image.relativePath)];
+  await checkedRun(logs, 'Git add', 'git', ['add', '--', ...pathsToCommit], { shell: false });
+  await checkedRun(logs, 'Git commit', 'git', ['commit', '-m', message, '--', ...pathsToCommit], { shell: false });
   await checkedRun(logs, 'Git push', 'git', ['push'], { shell: false });
 
   return { relativePath, logs };
@@ -900,6 +1099,10 @@ const html = String.raw`<!doctype html>
           .find((part) => part && !part.startsWith(String.fromCharCode(96, 96, 96))) || '';
       }
 
+      function isMarkdownFile(file) {
+        return /\.(md|mdx)$/i.test(file?.name || '');
+      }
+
       function applyMarkdown(markdown, fileName = '') {
         const { frontmatter, body } = splitFrontmatter(markdown);
         const baseName = fileName.replace(/\.(md|mdx)$/i, '');
@@ -1006,7 +1209,7 @@ const html = String.raw`<!doctype html>
         }
       }
 
-      async function readFile(file) {
+      async function readMarkdownFile(file) {
         state.sourceName = file.name;
         const markdown = await file.text();
         fields.extension.value = /\.mdx$/i.test(file.name) ? '.mdx' : '.md';
@@ -1027,12 +1230,13 @@ const html = String.raw`<!doctype html>
       fields.dropzone.addEventListener('drop', async (event) => {
         event.preventDefault();
         fields.dropzone.classList.remove('dragover');
-        const file = event.dataTransfer.files[0];
-        if (file) await readFile(file);
+        const file = [...event.dataTransfer.files].find(isMarkdownFile);
+        if (file) await readMarkdownFile(file);
       });
       fields.file.addEventListener('change', async () => {
         const file = fields.file.files[0];
-        if (file) await readFile(file);
+        if (file) await readMarkdownFile(file);
+        fields.file.value = '';
       });
 
       for (const field of [fields.title, fields.slug, fields.folder, fields.customFolder, fields.extension]) {
@@ -1053,6 +1257,7 @@ const html = String.raw`<!doctype html>
       $('build').addEventListener('click', () => submit('build'));
       $('save').addEventListener('click', () => submit('save'));
       $('clear').addEventListener('click', () => {
+        state.sourceName = '';
         fields.title.value = '';
         fields.slug.value = '';
         fields.description.value = '';

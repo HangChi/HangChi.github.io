@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
 import { existsSync } from 'node:fs';
-import { copyFile, mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readdir, readFile, stat, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -111,6 +111,39 @@ function normalizeTargetPath(folder, slug, extension) {
     safeSlug,
     relativePath: toPosix(path.relative(rootDir, targetFile)),
   };
+}
+
+function sameFilePath(a, b) {
+  const left = path.resolve(a);
+  const right = path.resolve(b);
+  return process.platform === 'win32'
+    ? left.toLowerCase() === right.toLowerCase()
+    : left === right;
+}
+
+async function findPostFilesBySlug(safeSlug, targetFile, dir = contentRoot) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  const matches = [];
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      matches.push(...(await findPostFilesBySlug(safeSlug, targetFile, fullPath)));
+      continue;
+    }
+
+    const extension = path.extname(entry.name).toLowerCase();
+    if (extension !== '.md' && extension !== '.mdx') continue;
+    if (path.basename(entry.name, extension) !== safeSlug) continue;
+    if (sameFilePath(fullPath, targetFile)) continue;
+
+    matches.push({
+      file: fullPath,
+      relativePath: toPosix(path.relative(rootDir, fullPath)),
+    });
+  }
+
+  return matches;
 }
 
 function yamlSingleQuote(value) {
@@ -439,9 +472,22 @@ async function publishPost(payload) {
   const logs = [];
   const imageAssets = await prepareImageAssets(payload, safeSlug, logs);
   const markdown = buildMarkdown({ ...payload, markdown: imageAssets.markdown });
+  const existingPostFiles = await findPostFilesBySlug(safeSlug, targetFile);
+  const existingPaths = existingPostFiles.map((file) => file.relativePath);
 
   if (existsSync(targetFile) && !payload.overwrite) {
     throw new Error(`File already exists: ${relativePath}`);
+  }
+
+  if (existingPostFiles.length > 0 && !payload.overwrite) {
+    throw new Error(
+      `File with the same slug already exists: ${existingPaths.join(', ')}`
+    );
+  }
+
+  for (const file of existingPostFiles) {
+    await unlink(file.file);
+    logs.push(`Removed duplicate ${file.relativePath}`);
   }
 
   await mkdir(targetDir, { recursive: true });
@@ -470,7 +516,11 @@ async function publishPost(payload) {
   }
 
   const message = String(payload.commitMessage || '').trim() || `post: ${payload.title}`;
-  const pathsToCommit = [relativePath, ...imageAssets.files.map((image) => image.relativePath)];
+  const pathsToCommit = [
+    relativePath,
+    ...existingPaths,
+    ...imageAssets.files.map((image) => image.relativePath),
+  ];
   await checkedRun(logs, 'Git add', 'git', ['add', '--', ...pathsToCommit], { shell: false });
   await checkedRun(logs, 'Git commit', 'git', ['commit', '-m', message, '--', ...pathsToCommit], { shell: false });
   await checkedRun(logs, 'Git push', 'git', ['push'], { shell: false });
@@ -955,7 +1005,7 @@ const html = String.raw`<!doctype html>
         <div class="checks">
           <label class="check"><input id="draft" type="checkbox" /> 保存为草稿</label>
           <label class="check"><input id="pinned" type="checkbox" /> 置顶</label>
-          <label class="check"><input id="overwrite" type="checkbox" /> 允许覆盖同名文章</label>
+          <label class="check"><input id="overwrite" type="checkbox" /> 允许覆盖同名文章（跨目录同 slug 会移动覆盖）</label>
         </div>
 
         <label>

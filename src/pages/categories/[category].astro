@@ -29,7 +29,7 @@ export async function getStaticPaths() {
         posts: filtered,
       },
     };
-  }).filter(({ props }) => props.posts.length > 0);
+  });
 }
 
 const { category, posts } = Astro.props as {
@@ -47,6 +47,8 @@ const { category, posts } = Astro.props as {
   <h1>{category.name}</h1>
   <p class="description">{category.description}</p>
   <p class="count">共 {posts.length} 篇文章</p>
+
+  {posts.length === 0 && <p class="empty">这个分类下还没有文章。</p>}
 
   <ul class="post-list">
     {
@@ -81,6 +83,9 @@ const { category, posts } = Astro.props as {
   .count {
     color: var(--text-muted);
     margin-top: 0;
+  }
+  .empty {
+    color: var(--text-muted);
   }
   .post-list {
     margin-top: 1.5rem;

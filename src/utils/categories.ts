@@ -21,6 +21,11 @@ export const CATEGORY_META = {
     name: 'Agent 相关',
     description: 'AI Agent、Claude Code、Skills 与自动化工作流',
   },
+  notes: {
+    slug: 'notes',
+    name: '学习笔记',
+    description: '学习记录、知识整理与阶段性复盘',
+  },
   blog: {
     slug: 'blog',
     name: '博客建站',
@@ -37,6 +42,7 @@ export const CATEGORY_ORDER = [
   'tutorials',
   'tools',
   'agent',
+  'notes',
   'blog',
 ] as const satisfies readonly CategorySlug[];
 
@@ -67,6 +73,7 @@ function inferCategoryFromPath(id: string): CategorySlug {
   if (id.startsWith('tutorials/')) return 'tutorials';
   if (id.startsWith('tools/')) return 'tools';
   if (id.startsWith('agent/')) return 'agent';
+  if (id.startsWith('notes/')) return 'notes';
   return 'blog';
 }
 

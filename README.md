@@ -60,6 +60,7 @@ draft: false          # true = 草稿，不发布
 
 - **文件名即网址**：`my-post.md` → `/blog/my-post/`（建议用英文+连字符）
 - **分类自动聚合**：填 `category` 可进入 `/categories/<分类>`；不填会按目录自动推断
+- **学习笔记分类**：文章 frontmatter 填 `category: 'notes'`，或保存到 `src/content/blog/notes/`
 - **标签自动生成聚合页**：填 `tags` 即可，无需手动建页
 - **草稿**：`draft: true` 的文章不会出现在列表、标签页和 RSS 中
 
@@ -95,6 +96,7 @@ public/              # 静态资源（favicon / robots）
 | 评论（Giscus） | `src/consts.ts` 的 `GISCUS` 对象 |
 | 配色 / 字体 / 排版 | `src/styles/global.css` |
 | 关于页内容 | `src/pages/about.astro` |
+| 文章分类 | `src/utils/categories.ts` 的 `CATEGORY_META` 和 `CATEGORY_ORDER` |
 
 > 📖 完整的搭建、配置与部署步骤见 **[SETUP.md](./SETUP.md)**
 

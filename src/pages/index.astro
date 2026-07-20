@@ -6,123 +6,89 @@ import TagList from '../components/TagList.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { comparePostsByPriority } from '../utils/categories';
 
-// 取所有非草稿文章：置顶优先，再按发布日期降序，首页展示最近 9 篇。
 const posts = (await getCollection('blog'))
   .filter((p) => !p.data.draft)
   .sort(comparePostsByPriority);
-
 const recent = posts.slice(0, 9);
 ---
 
 <Layout wide>
   <section class="hero">
-    <h1>{SITE_TITLE}</h1>
-    <p>{SITE_DESCRIPTION}</p>
+    <img src="/logo.png" alt="" width="64" height="64" />
+    <div>
+      <h1>{SITE_TITLE}</h1>
+      <p>{SITE_DESCRIPTION}</p>
+    </div>
   </section>
 
   <section class="recent">
     <div class="section-head">
       <h2>最新文章</h2>
-      <a href="/blog">全部 →</a>
+      <a href="/blog">查看全部 <span aria-hidden="true">→</span></a>
     </div>
 
-    {posts.length === 0 && <p class="empty">还没有文章，快去 src/content/blog 写第一篇吧！</p>}
+    {posts.length === 0 && <p class="empty">还没有文章，去写下第一篇吧。</p>}
 
     <ul class="post-list">
-      {
-        recent.map((post) => (
-          <li>
-            <div class="post-date">
-              {post.data.pinned && <span class="pin-flag">置顶</span>}
-              <FormattedDate date={post.data.pubDate} compact />
-            </div>
-            <div class="post-body">
-              <a class="post-link" href={`/blog/${post.id}/`}>
-                <h3 class="post-title">{post.data.title}</h3>
-                <p class="desc">{post.data.description}</p>
-              </a>
-              <TagList tags={post.data.tags} />
-            </div>
-          </li>
-        ))
-      }
+      {recent.map((post) => (
+        <li>
+          <div class="post-date">
+            {post.data.pinned && <span class="pin-flag">置顶</span>}
+            <FormattedDate date={post.data.pubDate} compact />
+          </div>
+          <div class="post-body">
+            <a class="post-link" href={`/blog/${post.id}/`}>
+              <h3 class="post-title">{post.data.title}</h3>
+              <p class="desc">{post.data.description}</p>
+            </a>
+            <TagList tags={post.data.tags} />
+          </div>
+        </li>
+      ))}
     </ul>
   </section>
 </Layout>
 
 <style>
   .hero {
-    text-align: center;
-    padding: 3.5rem 0 2.8rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 3.5rem 0 3rem;
+  }
+  .hero img {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 auto;
+    border-radius: var(--radius-md);
   }
   .hero h1 {
-    margin: 0 0 0.5rem;
-    font-size: 2.5rem;
-    letter-spacing: 0;
-    color: var(--text);
+    margin: 0 0 0.35rem;
+    font-size: 2.35rem;
+    letter-spacing: -0.04em;
   }
   .hero p {
-    color: var(--text-muted);
-    font-size: 1.08rem;
     margin: 0;
+    color: var(--text-muted);
+    font-size: 1.02rem;
   }
   .section-head {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 0.6rem;
-    margin-bottom: 1.4rem;
+    margin-bottom: 0.2rem;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid var(--border-strong);
   }
-  .section-head h2 {
-    margin: 0;
-    position: relative;
-    padding-left: 0.7rem;
-  }
-  /* 品牌渐变小竖条作为分区标记（与引用块的品牌边条相呼应） */
-  .section-head h2::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.18em;
-    bottom: 0.18em;
-    width: 3px;
-    border-radius: var(--radius-pill);
-    background: linear-gradient(180deg, var(--brand-cyan), var(--brand));
-  }
-  .section-head a {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    white-space: nowrap;
-  }
-  .section-head a:hover {
-    color: var(--link);
-    text-decoration: none;
-  }
-  .empty {
-    color: var(--text-muted);
-  }
+  .section-head h2 { margin: 0; font-size: 1.5rem; }
+  .section-head a { color: var(--text-muted); font-size: var(--text-sm); white-space: nowrap; }
+  .section-head a:hover { color: var(--link); text-decoration: none; }
+  .empty { color: var(--text-muted); }
 
-  /* 平板：hero 适度缩小 */
-  @media (max-width: 768px) {
-    .hero {
-      padding: 2.6rem 0 2rem;
-    }
-    .hero h1 {
-      font-size: 2.2rem;
-    }
-    .hero p {
-      font-size: 1rem;
-    }
-  }
-
-  /* 手机：hero 再收紧 */
-  @media (max-width: 480px) {
-    .hero {
-      padding: 1.8rem 0 1.5rem;
-    }
-    .hero h1 {
-      font-size: 1.8rem;
-    }
+  @media (max-width: 600px) {
+    .hero { align-items: flex-start; padding: 2.2rem 0 2rem; }
+    .hero img { width: 48px; height: 48px; }
+    .hero h1 { font-size: 1.75rem; }
+    .hero p { font-size: 0.95rem; }
   }
 </style>

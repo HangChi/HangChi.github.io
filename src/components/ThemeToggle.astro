@@ -17,9 +17,9 @@
 
 <style>
   #theme-toggle {
-    background: transparent;
+    background: var(--bg-elevated);
     border: 1px solid var(--border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     width: 38px;
     height: 38px;
     flex: 0 0 38px;
@@ -27,14 +27,15 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--text);
+    color: var(--text-muted);
     transition: background-color var(--dur-base) var(--ease-in-out),
       border-color var(--dur-base) var(--ease-in-out);
     padding: 0;
   }
   #theme-toggle:hover {
-    background: var(--bg-subtle);
-    border-color: var(--border-strong);
+    background: var(--tag-bg);
+    border-color: var(--brand);
+    color: var(--link);
   }
   /* 手机上增大可点击区域，符合触屏可达性 */
   @media (max-width: 480px) {
@@ -54,11 +55,18 @@
 
 <script>
   const btn = document.getElementById('theme-toggle');
+  const updateLabel = (isDark: boolean) => {
+    const label = isDark ? '切换浅色模式' : '切换深色模式';
+    btn?.setAttribute('aria-label', label);
+    btn?.setAttribute('title', label);
+  };
+  updateLabel(document.documentElement.classList.contains('dark'));
   btn?.addEventListener('click', () => {
     const root = document.documentElement;
     const isDark = root.classList.toggle('dark');
     const theme = isDark ? 'dark' : 'light';
     localStorage.setItem('theme', theme);
+    updateLabel(isDark);
     // 广播事件：让 Giscus 等组件同步主题
     window.dispatchEvent(
       new CustomEvent('theme-change', { detail: { theme } })

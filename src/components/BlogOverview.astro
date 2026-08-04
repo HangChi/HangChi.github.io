@@ -1,0 +1,169 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+import { getPostCategorySlug } from '../utils/categories';
+
+interface Props {
+  posts: CollectionEntry<'blog'>[];
+}
+
+const { posts } = Astro.props;
+const latestPost = [...posts].sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+)[0];
+const tagCount = new Set(
+  posts.flatMap((post) =>
+    post.data.tags
+      .map((tag) => tag.trim().toLocaleLowerCase('zh-CN'))
+      .filter(Boolean)
+  )
+).size;
+const categoryCount = new Set(posts.map(getPostCategorySlug)).size;
+---
+
+<aside class="blog-overview" aria-labelledby="blog-overview-title">
+  <p class="overview-label" id="blog-overview-title">博客概览</p>
+
+  {
+    latestPost ? (
+      <a class="latest-post" href={`/blog/${latestPost.id}/`}>
+        <span class="latest-meta">
+          <span>最新发布</span>
+          <FormattedDate date={latestPost.data.pubDate} compact />
+        </span>
+        <span class="latest-title">{latestPost.data.title}</span>
+        <span class="latest-arrow" aria-hidden="true">→</span>
+      </a>
+    ) : (
+      <p class="empty-state">文章正在整理中</p>
+    )
+  }
+
+  <nav class="overview-stats" aria-label="博客内容统计">
+    <a href="/blog">
+      <strong>{posts.length}</strong>
+      <span>文章</span>
+    </a>
+    <a href="/tags">
+      <strong>{tagCount}</strong>
+      <span>标签</span>
+    </a>
+    <a href="/categories">
+      <strong>{categoryCount}</strong>
+      <span>分类</span>
+    </a>
+  </nav>
+</aside>
+
+<style>
+  .blog-overview {
+    width: 23rem;
+    max-width: 100%;
+    min-width: 0;
+    flex: 0 0 23rem;
+    margin-left: auto;
+    padding: 1.15rem 1.25rem 1rem;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--bg-elevated) 58%, transparent);
+    box-shadow: inset 3px 0 0 var(--brand-cyan);
+  }
+  .overview-label {
+    margin: 0 0 0.55rem;
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--fw-medium);
+  }
+  .latest-post {
+    position: relative;
+    display: block;
+    min-height: 44px;
+    padding: 0.15rem 2rem 0.9rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+    color: var(--text);
+  }
+  .latest-post:hover {
+    color: var(--link);
+    text-decoration: none;
+  }
+  .latest-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.25rem 0.75rem;
+    margin-bottom: 0.25rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .latest-title {
+    display: block;
+    overflow: hidden;
+    font-size: 0.95rem;
+    font-weight: var(--fw-bold);
+    line-height: var(--leading-snug);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .latest-arrow {
+    position: absolute;
+    right: 0.2rem;
+    bottom: 0.8rem;
+    color: var(--brand-cyan);
+    font-family: var(--font-mono);
+    font-size: var(--text-md);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .latest-post:hover .latest-arrow { color: var(--link); }
+  .empty-state {
+    margin: 0;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+  .overview-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding-top: 0.8rem;
+  }
+  .overview-stats a {
+    display: flex;
+    min-width: 0;
+    min-height: 44px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.05rem;
+    color: var(--text-muted);
+  }
+  .overview-stats a + a {
+    border-left: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  }
+  .overview-stats a:hover {
+    color: var(--link);
+    text-decoration: none;
+  }
+  .overview-stats strong {
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: var(--text-md);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--leading-tight);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .overview-stats a:hover strong { color: var(--link); }
+  .overview-stats span { font-size: 0.72rem; }
+
+  @media (max-width: 840px) {
+    .blog-overview {
+      width: 100%;
+      flex: none;
+      margin-left: 0;
+    }
+    .latest-title { white-space: normal; }
+  }
+</style>

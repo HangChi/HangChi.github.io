@@ -7,34 +7,46 @@ interface Props {
   posts: CollectionEntry<'blog'>[];
   defaultLimit?: number;
   headingLevel?: 'h2' | 'h3';
+  showSort?: boolean;
+  showStatus?: boolean;
 }
 
-const { posts, defaultLimit, headingLevel = 'h2' } = Astro.props;
+const {
+  posts,
+  defaultLimit,
+  headingLevel = 'h2',
+  showSort = true,
+  showStatus = true,
+} = Astro.props;
 const Heading = headingLevel;
 const hasDefaultLimit = typeof defaultLimit === 'number';
 const initialCount = hasDefaultLimit ? Math.min(defaultLimit, posts.length) : posts.length;
 ---
 
 <section class="post-explorer" data-post-explorer data-default-limit={defaultLimit}>
-  <div class="post-tools" data-post-controls>
-    <p class="result-status" id="post-results-status" aria-live="polite">
+  <div class:list={['post-tools', { 'status-hidden': !showStatus }]} data-post-controls>
+    <p class:list={['result-status', { 'sr-only': !showStatus }]} id="post-results-status" aria-live="polite">
       <span data-post-count-prefix>{hasDefaultLimit ? '显示' : '共'}</span>
       <strong data-post-count>{initialCount}</strong>
       <span data-post-count-total>{hasDefaultLimit ? ` / ${posts.length}` : ''}</span> 篇文章
     </p>
-    <label class="sort-control" title="调整文章排序">
-      <span class="sr-only">排序方式</span>
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 6h18M6 12h12M10 18h4"></path>
-      </svg>
-      <select name="sort" data-post-sort>
-        <option value="default">默认排序</option>
-        <option value="date-desc">时间 ↓</option>
-        <option value="date-asc">时间 ↑</option>
-        <option value="title-asc">名称 A-Z</option>
-        <option value="title-desc">名称 Z-A</option>
-      </select>
-    </label>
+    {
+      showSort && (
+        <label class="sort-control" title="调整文章排序">
+          <span class="sr-only">排序方式</span>
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18M6 12h12M10 18h4"></path>
+          </svg>
+          <select name="sort" data-post-sort>
+            <option value="default">默认排序</option>
+            <option value="date-desc">时间 ↓</option>
+            <option value="date-asc">时间 ↑</option>
+            <option value="title-asc">名称 A-Z</option>
+            <option value="title-desc">名称 Z-A</option>
+          </select>
+        </label>
+      )
+    }
   </div>
 
   <ul class="post-list" data-post-list>
@@ -93,7 +105,7 @@ const initialCount = hasDefaultLimit ? Math.min(defaultLimit, posts.length) : po
     const list = explorer.querySelector<HTMLUListElement>('[data-post-list]');
     const empty = explorer.querySelector<HTMLElement>('[data-post-empty]');
 
-    if (!select || !count || !countPrefix || !countTotal || !list || !empty) return;
+    if (!count || !countPrefix || !countTotal || !list || !empty) return;
 
     const items = Array.from(list.querySelectorAll<HTMLElement>('[data-post-item]'));
     const limitValue = Number(explorer.dataset.defaultLimit);
@@ -101,7 +113,7 @@ const initialCount = hasDefaultLimit ? Math.min(defaultLimit, posts.length) : po
     const params = new URLSearchParams(window.location.search);
     const query = normalize(params.get('q') ?? '');
     const initialSort = params.get('sort') ?? 'default';
-    select.value = validSorts.has(initialSort) ? initialSort : 'default';
+    if (select) select.value = validSorts.has(initialSort) ? initialSort : 'default';
 
     const compareItems = (a: HTMLElement, b: HTMLElement, sort: string) => {
       const titleA = a.dataset.title ?? '';
@@ -124,7 +136,8 @@ const initialCount = hasDefaultLimit ? Math.min(defaultLimit, posts.length) : po
     };
 
     const update = () => {
-      const sort = validSorts.has(select.value) ? select.value : 'default';
+      const selectedSort = select?.value ?? 'default';
+      const sort = validSorts.has(selectedSort) ? selectedSort : 'default';
       const orderedItems = [...items].sort((a, b) => compareItems(a, b, sort));
       let matchingCount = 0;
       let visibleCount = 0;
@@ -146,7 +159,7 @@ const initialCount = hasDefaultLimit ? Math.min(defaultLimit, posts.length) : po
       updateUrl(sort);
     };
 
-    select.addEventListener('change', update);
+    select?.addEventListener('change', update);
 
     update();
   });
@@ -160,6 +173,10 @@ const initialCount = hasDefaultLimit ? Math.min(defaultLimit, posts.length) : po
     gap: 0.75rem;
     margin: 0.4rem 0 0.15rem;
     padding: 0.45rem 0;
+  }
+  .post-tools.status-hidden {
+    margin: 0;
+    padding: 0;
   }
   .sort-control {
     position: relative;

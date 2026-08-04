@@ -27,8 +27,10 @@ const categories = CATEGORY_ORDER.map((slug) => ({
 ---
 
 <Layout title="分类" description="按分类浏览全部文章" wide>
-  <h1>分类</h1>
-  <p class="count">共 {categories.length} 个分类</p>
+  <header class="category-head">
+    <h1>分类</h1>
+    <p class="count">共 {categories.length} 个分类</p>
+  </header>
 
   {categories.length === 0 && <p class="empty">还没有任何分类。</p>}
 
@@ -50,10 +52,23 @@ const categories = CATEGORY_ORDER.map((slug) => ({
 </Layout>
 
 <style>
+  .category-head {
+    position: relative;
+    padding-left: 1rem;
+  }
+  .category-head::before {
+    position: absolute;
+    inset: 0.35rem auto 0.45rem 0;
+    width: 3px;
+    border-radius: var(--radius-pill);
+    background: var(--brand-cyan);
+    content: '';
+  }
+  .category-head h1 { margin-bottom: 0.65rem; }
   .count,
   .empty {
     color: var(--text-muted);
-    margin-top: -0.5rem;
+    margin-top: 0;
   }
   .category-list {
     list-style: none;
@@ -61,8 +76,9 @@ const categories = CATEGORY_ORDER.map((slug) => ({
     margin: 1.5rem 0 0;
   }
   .category-list li {
-    margin: 0;
-    border-bottom: 1px solid var(--border);
+    margin: 0 -0.75rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+    border-radius: var(--radius-md);
   }
   .category-list li:last-child {
     border-bottom: none;
@@ -71,10 +87,12 @@ const categories = CATEGORY_ORDER.map((slug) => ({
     display: flex;
     justify-content: space-between;
     gap: 1.5rem;
-    padding: 1.15rem 0;
+    padding: 1.2rem 0.75rem;
     color: var(--text);
   }
   .category-list a:hover {
+    background: color-mix(in srgb, var(--surface-brand) 64%, transparent);
+    box-shadow: inset 3px 0 0 var(--brand-cyan);
     text-decoration: none;
   }
   .category-list h2 {
@@ -93,10 +111,12 @@ const categories = CATEGORY_ORDER.map((slug) => ({
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     white-space: nowrap;
+    transition: color var(--dur-fast) var(--ease-out);
   }
   .category-list a:hover h2 {
     color: var(--link);
   }
+  .category-list a:hover span { color: var(--link); }
 
   @media (max-width: 640px) {
     .category-list a {

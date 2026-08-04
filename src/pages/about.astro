@@ -4,24 +4,58 @@ import { AUTHOR } from '../consts';
 ---
 
 <Layout title="关于" description="关于本站与作者" wide>
-  <h1>关于</h1>
+  <article class="about-page">
+    <h1>关于</h1>
 
-  <p>你好，我是 {AUTHOR}，欢迎来到爱达堡的技术博客。</p>
+    <p class="lead">你好，我是 {AUTHOR}，欢迎来到爱达堡的技术博客。</p>
 
-  <p>这里记录我在软件开发中的学习笔记、踩坑经验与一些零散思考。</p>
+    <p>这里记录我在软件开发中的学习笔记、踩坑经验与一些零散思考。</p>
 
-  <h2>这个博客用什么搭的</h2>
-  <ul>
-    <li><strong>框架</strong>：Astro（内容优先的静态站点生成器）</li>
-    <li><strong>部署</strong>：GitHub Pages + GitHub Actions 自动构建</li>
-    <li><strong>评论</strong>：Giscus（基于 GitHub Discussions）</li>
-    <li><strong>特性</strong>：深色模式、分类与标签、RSS 订阅、中文排版优化</li>
-  </ul>
+    <h2>这个博客用什么搭的</h2>
+    <ul>
+      <li><strong>框架</strong>：Astro（内容优先的静态站点生成器）</li>
+      <li><strong>部署</strong>：GitHub Pages + GitHub Actions 自动构建</li>
+      <li><strong>评论</strong>：Giscus（基于 GitHub Discussions）</li>
+      <li><strong>特性</strong>：深色模式、分类与标签、RSS 订阅、中文排版优化</li>
+    </ul>
 
-  <h2>联系</h2>
-  <p>
-    可以通过
-    <a href="https://github.com/HangChi" target="_blank" rel="noopener">GitHub</a>
-    找到我。
-  </p>
+    <h2>联系</h2>
+    <p>
+      可以通过
+      <a href="https://github.com/HangChi" target="_blank" rel="noopener">GitHub</a>
+      找到我。
+    </p>
+  </article>
 </Layout>
+
+<style>
+  .about-page {
+    max-width: var(--width-content);
+    margin: 0 auto;
+  }
+  .about-page h1 {
+    position: relative;
+    padding-left: 1rem;
+  }
+  .about-page h1::before,
+  .about-page h2::before {
+    position: absolute;
+    left: 0;
+    width: 3px;
+    border-radius: var(--radius-pill);
+    background: var(--brand-cyan);
+    content: '';
+  }
+  .about-page h1::before { top: 0.2em; bottom: 0.18em; }
+  .about-page h2 {
+    position: relative;
+    padding-left: 0.8rem;
+  }
+  .about-page h2::before { top: 0.22em; bottom: 0.2em; background: var(--brand); }
+  .lead {
+    color: var(--text);
+    font-size: var(--text-md);
+    font-weight: var(--fw-medium);
+  }
+  .about-page li::marker { color: var(--brand-cyan); }
+</style>

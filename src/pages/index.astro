@@ -1,21 +1,20 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
-import FormattedDate from '../components/FormattedDate.astro';
-import TagList from '../components/TagList.astro';
+import PostExplorer from '../components/PostExplorer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { comparePostsByPriority } from '../utils/categories';
 
 const posts = (await getCollection('blog'))
   .filter((p) => !p.data.draft)
   .sort(comparePostsByPriority);
-const recent = posts.slice(0, 9);
 ---
 
 <Layout wide>
   <section class="hero">
     <img src="/logo.png" alt="" width="64" height="64" />
-    <div>
+    <div class="hero-copy">
+      <span class="hero-kicker">HANGCHI · DEV NOTES</span>
       <h1>{SITE_TITLE}</h1>
       <p>{SITE_DESCRIPTION}</p>
     </div>
@@ -27,25 +26,7 @@ const recent = posts.slice(0, 9);
       <a href="/blog">查看全部 <span aria-hidden="true">→</span></a>
     </div>
 
-    {posts.length === 0 && <p class="empty">还没有文章，去写下第一篇吧。</p>}
-
-    <ul class="post-list">
-      {recent.map((post) => (
-        <li>
-          <div class="post-date">
-            {post.data.pinned && <span class="pin-flag">置顶</span>}
-            <FormattedDate date={post.data.pubDate} compact />
-          </div>
-          <div class="post-body">
-            <a class="post-link" href={`/blog/${post.id}/`}>
-              <h3 class="post-title">{post.data.title}</h3>
-              <p class="desc">{post.data.description}</p>
-            </a>
-            <TagList tags={post.data.tags} />
-          </div>
-        </li>
-      ))}
-    </ul>
+    <PostExplorer posts={posts} defaultLimit={9} headingLevel="h3" />
   </section>
 </Layout>
 
@@ -53,19 +34,41 @@ const recent = posts.slice(0, 9);
   .hero {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
-    padding: 3.5rem 0 3rem;
+    gap: 1.5rem;
+    min-height: 15rem;
+    padding: 3.25rem 0 2.75rem;
   }
   .hero img {
-    width: 64px;
-    height: 64px;
+    width: 76px;
+    height: 76px;
     flex: 0 0 auto;
-    border-radius: var(--radius-md);
+    border-radius: 0;
+    filter: drop-shadow(0 12px 18px color-mix(in srgb, var(--brand-deep) 18%, transparent));
+  }
+  .hero-copy {
+    position: relative;
+    padding-left: 1.25rem;
+  }
+  .hero-copy::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    border-radius: var(--radius-pill);
+    background: var(--brand-cyan);
+    content: '';
+  }
+  .hero-kicker {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: var(--fw-bold);
   }
   .hero h1 {
-    margin: 0 0 0.35rem;
-    font-size: 2.35rem;
-    letter-spacing: -0.04em;
+    margin: 0 0 0.45rem;
+    font-size: 2.4rem;
+    letter-spacing: 0;
   }
   .hero p {
     margin: 0;
@@ -76,18 +79,38 @@ const recent = posts.slice(0, 9);
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    margin-bottom: 0.2rem;
-    padding-bottom: 0.7rem;
-    border-bottom: 1px solid var(--border-strong);
+    margin-bottom: 0.15rem;
+    padding-bottom: 0.5rem;
   }
-  .section-head h2 { margin: 0; font-size: 1.5rem; }
-  .section-head a { color: var(--text-muted); font-size: var(--text-sm); white-space: nowrap; }
-  .section-head a:hover { color: var(--link); text-decoration: none; }
-  .empty { color: var(--text-muted); }
-
+  .section-head h2 {
+    position: relative;
+    margin: 0;
+    padding-left: 0.9rem;
+    font-size: 1.5rem;
+  }
+  .section-head h2::before {
+    position: absolute;
+    top: 0.22em;
+    bottom: 0.18em;
+    left: 0;
+    width: 3px;
+    border-radius: var(--radius-pill);
+    background: var(--brand);
+    content: '';
+  }
+  .section-head a {
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    font-weight: var(--fw-medium);
+    white-space: nowrap;
+  }
+  .section-head a:hover { color: var(--link); background: var(--surface-brand); text-decoration: none; }
   @media (max-width: 600px) {
-    .hero { align-items: flex-start; padding: 2.2rem 0 2rem; }
-    .hero img { width: 48px; height: 48px; }
+    .hero { min-height: 12rem; align-items: center; gap: 1rem; padding: 2rem 0 1.75rem; }
+    .hero img { width: 52px; height: 52px; }
+    .hero-copy { padding-left: 0.85rem; }
     .hero h1 { font-size: 1.75rem; }
     .hero p { font-size: 0.95rem; }
   }

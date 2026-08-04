@@ -4,25 +4,34 @@ const year = new Date().getFullYear();
 ---
 
 <footer>
-  <p>
-    &copy; {year} {AUTHOR}. 由
-    <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>
-    强力驱动。
-  </p>
-  <p class="rss">
-    <a href="/rss.xml">RSS 订阅</a>
-  </p>
+  <div class="footer-inner">
+    <p>
+      &copy; {year} {AUTHOR}. 由
+      <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>
+      强力驱动。
+    </p>
+    <p class="rss">
+      <a href="/rss.xml">RSS 订阅 <span aria-hidden="true">↗</span></a>
+    </p>
+  </div>
 </footer>
 
 <style>
   footer {
     flex-shrink: 0;
-    border-top: 1px solid var(--border);
+    background: var(--bg-subtle);
     color: var(--text-muted);
-    text-align: center;
-    padding: var(--space-6) var(--space-4);
+    padding: var(--space-5) var(--space-4);
     font-size: var(--text-sm);
-    transition: border-color var(--dur-base) var(--ease-in-out);
+    transition: background-color var(--dur-base) var(--ease-in-out);
+  }
+  .footer-inner {
+    display: flex;
+    max-width: var(--width-wide);
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin: 0 auto;
   }
   footer p {
     margin: 0.3em 0;
@@ -33,5 +42,8 @@ const year = new Date().getFullYear();
   }
   footer a:hover {
     color: var(--link);
+  }
+  @media (max-width: 560px) {
+    .footer-inner { flex-direction: column; gap: 0; text-align: center; }
   }
 </style>

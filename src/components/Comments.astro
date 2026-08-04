@@ -37,7 +37,7 @@ import { GISCUS } from '../consts';
     ) {
       container.innerHTML =
         '<p style="color:var(--text-muted);font-size:0.9rem">' +
-        '💬 评论区尚未配置。请按 SETUP.md 第 4 节在 src/consts.ts 填入 giscus 信息。</p>';
+        '评论区尚未配置。请按 SETUP.md 第 4 节在 src/consts.ts 填入 giscus 信息。</p>';
       container.dataset.loaded = '1';
       return;
     }
@@ -100,10 +100,20 @@ import { GISCUS } from '../consts';
   .comments {
     margin-top: 3rem;
     padding-top: 2rem;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
   }
   .comments h2 {
+    position: relative;
     font-size: 1.3rem;
     margin-top: 0;
+    padding-left: 0.75rem;
+  }
+  .comments h2::before {
+    position: absolute;
+    inset: 0.22em auto 0.18em 0;
+    width: 3px;
+    border-radius: var(--radius-pill);
+    background: var(--brand-cyan);
+    content: '';
   }
 </style>

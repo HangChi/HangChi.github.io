@@ -16,90 +16,156 @@ const articleCategories = CATEGORY_ORDER.map((slug) => CATEGORY_META[slug]);
       <span>{SITE_TITLE}</span>
     </a>
 
-    <div class="nav-right">
-      <div class="links">
-        <a href="/" class={isActive('/') ? 'active' : undefined} aria-current={isActive('/') ? 'page' : undefined}>首页</a>
-        <div class="nav-item">
-          <a
-            href="/blog"
-            class={isArticleActive ? 'active' : undefined}
-            aria-current={path.startsWith('/blog') ? 'page' : undefined}
-            aria-haspopup="true"
-          >文章</a>
-          <div class="article-menu" aria-label="文章分类">
-            {articleCategories.map((category) => (
-              <a href={getCategoryPath(category.slug)}>
-                <span>{category.name}</span>
-                <small>{category.description}</small>
-              </a>
-            ))}
-          </div>
+    <div class="links">
+      <a href="/" class={isActive('/') ? 'active' : undefined} aria-current={isActive('/') ? 'page' : undefined}>首页</a>
+      <div class="nav-item">
+        <a
+          href="/blog"
+          class={isArticleActive ? 'active' : undefined}
+          aria-current={path.startsWith('/blog') ? 'page' : undefined}
+          aria-haspopup="true"
+        >文章</a>
+        <div class="article-menu" aria-label="文章分类">
+          {articleCategories.map((category) => (
+            <a href={getCategoryPath(category.slug)}>
+              <span>{category.name}</span>
+              <small>{category.description}</small>
+            </a>
+          ))}
         </div>
-        <a href="/tags" class={isActive('/tags') ? 'active' : undefined} aria-current={isActive('/tags') ? 'page' : undefined}>标签</a>
-        <a href="/about" class={isActive('/about') ? 'active' : undefined} aria-current={isActive('/about') ? 'page' : undefined}>关于</a>
       </div>
+      <a href="/tags" class={isActive('/tags') ? 'active' : undefined} aria-current={isActive('/tags') ? 'page' : undefined}>标签</a>
+      <a href="/about" class={isActive('/about') ? 'active' : undefined} aria-current={isActive('/about') ? 'page' : undefined}>关于</a>
+    </div>
+
+    <div class="nav-tools">
+      <form class="site-search" action="/blog" method="get" role="search">
+        <label class="sr-only" for="site-search-input">搜索文章</label>
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.5-3.5"></path>
+        </svg>
+        <input
+          id="site-search-input"
+          type="search"
+          name="q"
+          placeholder="搜索"
+          autocomplete="off"
+          data-site-search
+        />
+      </form>
       <ThemeToggle />
     </div>
   </nav>
 </header>
+
+<script>
+  const siteSearch = document.querySelector<HTMLInputElement>('[data-site-search]');
+  if (siteSearch && window.location.pathname.startsWith('/blog')) {
+    siteSearch.value = new URLSearchParams(window.location.search).get('q') ?? '';
+  }
+</script>
 
 <style>
   header {
     position: sticky;
     top: 0;
     z-index: var(--z-header);
-    min-height: 62px;
-    border-bottom: 1px solid var(--border);
-    background: color-mix(in srgb, var(--bg) 94%, transparent);
-    backdrop-filter: blur(12px);
+    min-height: 68px;
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+    background: color-mix(in srgb, var(--bg-elevated) 91%, transparent);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--brand) 5%, transparent);
+    backdrop-filter: blur(16px) saturate(140%);
   }
   nav {
     display: flex;
-    min-height: 62px;
+    min-height: 68px;
     max-width: var(--width-wide);
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 1.25rem;
     margin: 0 auto;
-    padding: 0.75rem 1.5rem;
+    padding: 0.65rem 1.5rem;
   }
   .site-title {
     display: inline-flex;
     align-items: center;
-    gap: 0.55rem;
+    gap: 0.65rem;
     color: var(--text);
-    font-size: 1.05rem;
+    font-size: 1.02rem;
     font-weight: var(--fw-bold);
     white-space: nowrap;
   }
   .site-title:hover { color: var(--link); text-decoration: none; }
   .logo { display: block; flex: 0 0 auto; border-radius: var(--radius-sm); }
-  .nav-right, .links { display: flex; align-items: center; }
-  .nav-right { gap: 0.8rem; }
-  .links { gap: 1rem; }
+  .links, .nav-tools { display: flex; align-items: center; }
+  .links { gap: 0.4rem; margin-left: auto; }
+  .nav-tools { gap: 0.5rem; }
+  .site-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    color: var(--text-faint);
+  }
+  .site-search svg {
+    position: absolute;
+    left: 0.62rem;
+    width: 0.92rem;
+    height: 0.92rem;
+    pointer-events: none;
+  }
+  .site-search input {
+    width: 7.75rem;
+    height: 34px;
+    padding: 0.3rem 0.65rem 0.3rem 2rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    color: var(--text);
+    background: var(--bg-subtle);
+    font: inherit;
+    font-size: var(--text-xs);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--border) 45%, transparent);
+    transition: width var(--dur-base) var(--ease-out), background-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+  }
+  .site-search input::placeholder { color: var(--text-faint); }
+  .site-search input:hover { background: var(--bg-elevated); box-shadow: inset 0 0 0 1px var(--border-strong); }
+  .site-search input:focus { width: 10rem; background: var(--bg-elevated); box-shadow: inset 0 0 0 1px var(--brand), 0 0 0 3px color-mix(in srgb, var(--brand) 14%, transparent); }
   .links > a, .nav-item > a {
     display: inline-flex;
-    min-height: 36px;
+    min-height: 44px;
     align-items: center;
-    padding: 0.2rem 0;
-    border-bottom: 2px solid transparent;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-sm);
     color: var(--text-muted);
     font-size: var(--text-sm);
+    font-weight: var(--fw-medium);
+    position: relative;
   }
-  .links > a:hover, .nav-item > a:hover { color: var(--text); text-decoration: none; }
-  .links > a.active, .nav-item > a.active { border-bottom-color: var(--brand); color: var(--text); }
+  .links > a:hover, .nav-item > a:hover { color: var(--text); background: var(--bg-subtle); text-decoration: none; }
+  .links > a.active, .nav-item > a.active { color: var(--link); }
+  .links > a.active::after, .nav-item > a.active::after {
+    position: absolute;
+    right: 0.55rem;
+    bottom: 0.28rem;
+    left: 0.55rem;
+    height: 2px;
+    border-radius: var(--radius-pill);
+    background: var(--brand-cyan);
+    content: '';
+  }
   .nav-item { position: relative; display: inline-flex; }
   .article-menu {
     position: absolute;
     top: calc(100% + 0.55rem);
     left: 50%;
     z-index: var(--z-overlay);
-    width: 12rem;
-    padding: 0.35rem;
-    border: 1px solid var(--border);
+    width: 13rem;
+    padding: 0.45rem;
+    border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
     border-radius: var(--radius-md);
     background: var(--bg-elevated);
-    box-shadow: 0 12px 28px var(--shadow);
+    box-shadow: var(--shadow-md);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -115,7 +181,7 @@ const articleCategories = CATEGORY_ORDER.map((slug) => CATEGORY_META[slug]);
   }
   .article-menu a {
     display: block;
-    padding: 0.5rem 0.6rem;
+    padding: 0.6rem 0.65rem;
     border-radius: var(--radius-sm);
     color: var(--text);
   }
@@ -124,13 +190,35 @@ const articleCategories = CATEGORY_ORDER.map((slug) => CATEGORY_META[slug]);
   .article-menu span { font-size: 0.88rem; line-height: 1.35; }
   .article-menu small { margin-top: 0.1rem; color: var(--text-muted); font-size: 0.72rem; line-height: 1.35; }
 
-  @media (max-width: 600px) {
-    header, nav { min-height: 104px; }
-    nav { flex-direction: column; gap: 0.45rem; padding: 0.65rem 1rem; }
-    .nav-right { width: 100%; justify-content: space-between; }
-    .links { gap: 0.8rem; }
-    .links > a, .nav-item > a { min-height: 38px; font-size: 0.84rem; }
+  @media (max-width: 700px) {
+    header, nav { min-height: 112px; }
+    nav {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.25rem 0.75rem;
+      padding: 0.55rem 1rem;
+    }
+    .site-title { align-self: center; }
+    .links {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      width: 100%;
+      justify-content: space-between;
+      margin: 0;
+    }
+    .nav-tools { grid-column: 2; grid-row: 1; }
+    .site-search input,
+    .site-search input:focus { width: 7.25rem; }
+    .links > a, .nav-item > a { min-height: 40px; font-size: 0.84rem; }
     .article-menu { right: -2.4rem; left: auto; transform: translate(0, -4px); }
     .nav-item:hover .article-menu, .nav-item:focus-within .article-menu { transform: translate(0, 0); }
+  }
+
+  @media (max-width: 420px) {
+    nav { padding-inline: 0.75rem; }
+    .site-title span { display: none; }
+    .site-search input,
+    .site-search input:focus { width: 6.25rem; }
+    .links > a, .nav-item > a { padding-inline: 0.4rem; }
   }
 </style>

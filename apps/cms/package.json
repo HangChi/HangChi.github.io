@@ -8,6 +8,7 @@
     "build": "pnpm --filter @blog/contracts build && tsc -p tsconfig.build.json && node scripts/copy-assets.mjs",
     "migrate": "tsx src/db/migrate.ts",
     "create-admin": "tsx src/cli/create-admin.ts",
+    "reset-admin-password": "tsx src/cli/reset-admin-password.ts",
     "import": "tsx src/cli/import-posts.ts"
   },
   "dependencies": {

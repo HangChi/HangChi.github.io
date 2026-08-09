@@ -17,9 +17,10 @@ The public blog remains an nginx-served Astro static site. The CMS API and admin
 1. Install Node.js 24, pnpm, nginx, and a MySQL 8 client.
 2. Build each new release with `pnpm install --frozen-lockfile && pnpm build:admin && pnpm build:cms`, then atomically update `/opt/blog-cms/current`.
 3. Copy `.env.cms.example` to `/etc/blog-cms/cms.env`, replace placeholders, remove the two `CMS_ADMIN_*` lines, and set mode `0600`.
-4. Install the unit files from `ops/systemd`, then run `systemctl daemon-reload`.
-5. Create the first administrator once by temporarily exporting `CMS_ADMIN_PASSWORD` and running `pnpm --filter @blog/cms create-admin`.
-6. Start with `systemctl enable --now blog-cms blog-cms-backup.timer`.
+4. Create the protected backup directory with `install -d -m 0700 -o blogcms -g blogcms /var/backups/blog-cms`.
+5. Install the unit files from `ops/systemd`, then run `systemctl daemon-reload`.
+6. Create the first administrator once by temporarily exporting `CMS_ADMIN_PASSWORD` and running `pnpm --filter @blog/cms create-admin`.
+7. Start with `systemctl enable --now blog-cms blog-cms-backup.timer`.
 
 Never place a database or administrator password in Git, command history, or a systemd unit. Verify with `curl http://127.0.0.1:8790/api/health/ready`.
 

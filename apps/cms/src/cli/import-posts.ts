@@ -9,7 +9,8 @@ import { Importer } from '../services/importer.js';
 
 export async function runImport(arguments_: string[] = process.argv.slice(2)): Promise<void> {
   const sourceArgument = arguments_.find((value) => value.startsWith('--source='));
-  const source = path.resolve(sourceArgument?.slice('--source='.length) || 'src/content/blog');
+  const defaultSource = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../src/content/blog');
+  const source = path.resolve(sourceArgument?.slice('--source='.length) || defaultSource);
   const dryRun = arguments_.includes('--dry-run');
   if (dryRun) {
     const importer = new Importer({ upsert: async () => 'unchanged' });

@@ -3,11 +3,20 @@
   "type": "module",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.16.0",
   "scripts": {
-    "admin": "node scripts/blog-admin.mjs",
+    "admin": "pnpm admin:dev",
+    "admin:legacy": "node scripts/blog-admin.mjs",
+    "admin:dev": "pnpm --filter @blog/admin dev",
+    "cms:dev": "pnpm --filter @blog/cms dev",
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
+    "build:admin": "pnpm --filter @blog/admin build",
+    "build:cms": "pnpm --filter @blog/cms build",
+    "test": "vitest run",
+    "test:admin": "vitest run apps/admin",
+    "test:cms": "vitest run apps/cms",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -21,5 +30,9 @@
     "katex": "^0.16.11",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
   }
 }

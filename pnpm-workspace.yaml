@@ -6,3 +6,6 @@ allowBuilds:
   argon2: true
   esbuild: true
   sharp: true
+
+minimumReleaseAgeExclude:
+  - lucide-react@1.31.0

@@ -7,6 +7,7 @@ import { HttpAuthError } from './plugins/auth.js';
 import { registerAuthRoutes } from './routes/auth.js';
 import { registerPostRoutes } from './routes/posts.js';
 import { registerTaxonomyRoutes } from './routes/taxonomy.js';
+import { registerUploadRoutes, type ImageUploadService } from './routes/uploads.js';
 import { InvalidCredentialsError, type AuthService } from './services/auth-service.js';
 import { PostNotFoundError, type PostService } from './services/post-service.js';
 import { PostVersionConflictError } from './repositories/types.js';
@@ -18,6 +19,7 @@ export type AppDependencies = {
   logger?: boolean;
   postService?: PostService;
   taxonomyRepository?: TaxonomyRepository;
+  imageUploadService?: ImageUploadService;
 };
 
 export async function buildApp(dependencies: AppDependencies): Promise<FastifyInstance> {
@@ -40,6 +42,12 @@ export async function buildApp(dependencies: AppDependencies): Promise<FastifyIn
     await registerTaxonomyRoutes(app, {
       authService: dependencies.authService,
       taxonomyRepository: dependencies.taxonomyRepository,
+    });
+  }
+  if (dependencies.imageUploadService) {
+    await registerUploadRoutes(app, {
+      authService: dependencies.authService,
+      imageUploadService: dependencies.imageUploadService,
     });
   }
 
@@ -68,6 +76,9 @@ export async function buildApp(dependencies: AppDependencies): Promise<FastifyIn
         message: '提交的数据不符合要求',
         fields: error.issues.map((issue) => ({ path: issue.path.join('.'), message: issue.message })),
       });
+    }
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'FST_REQ_FILE_TOO_LARGE') {
+      return reply.status(413).send({ code: 'IMAGE_TOO_LARGE', message: '图片不能超过 10 MiB' });
     }
     request.log.error({ err: error }, 'request failed');
     return reply.status(500).send({ code: 'INTERNAL_ERROR', message: '服务器暂时无法完成请求' });

@@ -5,12 +5,19 @@ import { ZodError } from 'zod';
 
 import { HttpAuthError } from './plugins/auth.js';
 import { registerAuthRoutes } from './routes/auth.js';
+import { registerPostRoutes } from './routes/posts.js';
+import { registerTaxonomyRoutes } from './routes/taxonomy.js';
 import { InvalidCredentialsError, type AuthService } from './services/auth-service.js';
+import { PostNotFoundError, type PostService } from './services/post-service.js';
+import { PostVersionConflictError } from './repositories/types.js';
+import type { TaxonomyRepository } from './repositories/taxonomy-repository.js';
 
 export type AppDependencies = {
   authService: AuthService;
   cookieSecure: boolean;
   logger?: boolean;
+  postService?: PostService;
+  taxonomyRepository?: TaxonomyRepository;
 };
 
 export async function buildApp(dependencies: AppDependencies): Promise<FastifyInstance> {
@@ -23,6 +30,18 @@ export async function buildApp(dependencies: AppDependencies): Promise<FastifyIn
   await app.register(cookie);
   await app.register(rateLimit, { global: false });
   await registerAuthRoutes(app, dependencies);
+  if (dependencies.postService) {
+    await registerPostRoutes(app, {
+      authService: dependencies.authService,
+      postService: dependencies.postService,
+    });
+  }
+  if (dependencies.taxonomyRepository) {
+    await registerTaxonomyRoutes(app, {
+      authService: dependencies.authService,
+      taxonomyRepository: dependencies.taxonomyRepository,
+    });
+  }
 
   app.get('/api/health/live', async () => ({ ok: true }));
 
@@ -36,6 +55,12 @@ export async function buildApp(dependencies: AppDependencies): Promise<FastifyIn
     }
     if (error instanceof InvalidCredentialsError) {
       return reply.status(401).send({ code: 'INVALID_CREDENTIALS', message: error.message });
+    }
+    if (error instanceof PostNotFoundError) {
+      return reply.status(404).send({ code: 'POST_NOT_FOUND', message: error.message });
+    }
+    if (error instanceof PostVersionConflictError) {
+      return reply.status(409).send({ code: 'POST_VERSION_CONFLICT', message: error.message });
     }
     if (error instanceof ZodError) {
       return reply.status(400).send({

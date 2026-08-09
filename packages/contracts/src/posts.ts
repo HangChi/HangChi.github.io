@@ -42,6 +42,11 @@ export const TaxonomyDtoSchema = z.object({
   slug: z.string(),
 });
 
+export const TaxonomyInputSchema = z.object({
+  name: z.string().trim().min(1).max(191),
+  slug: SlugSchema,
+});
+
 export const PostDtoSchema = z.object({
   id: EntityIdSchema,
   title: z.string(),
@@ -87,3 +92,4 @@ export type PostDto = z.infer<typeof PostDtoSchema>;
 export type PostListResponse = z.infer<typeof PostListResponseSchema>;
 export type PostVersionDto = z.infer<typeof PostVersionDtoSchema>;
 export type TaxonomyDto = z.infer<typeof TaxonomyDtoSchema>;
+export type TaxonomyInput = z.infer<typeof TaxonomyInputSchema>;

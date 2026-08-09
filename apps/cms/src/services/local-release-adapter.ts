@@ -53,6 +53,7 @@ export class LocalReleaseAdapter {
     await mkdir(this.releasesRoot, { recursive: true });
     await cp(this.sourceRoot, sourceTarget, {
       recursive: true,
+      dereference: true,
       filter: (source) => {
         const relative = path.relative(this.sourceRoot, source);
         if (!relative) return true;

@@ -7,9 +7,9 @@ Wants=network-online.target
 Type=simple
 User=blogcms
 Group=blogcms
-WorkingDirectory=/opt/blog-cms/source
+WorkingDirectory=/opt/blog-cms/current
 EnvironmentFile=/etc/blog-cms/cms.env
-ExecStart=/usr/bin/node /opt/blog-cms/source/apps/cms/dist/server.js
+ExecStart=/usr/local/bin/node /opt/blog-cms/current/apps/cms/dist/server.js
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=120
@@ -17,7 +17,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/var/www/blog-releases /var/www/blog-current
+ReadWritePaths=/var/lib/blog-cms
 
 [Install]
 WantedBy=multi-user.target

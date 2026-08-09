@@ -13,6 +13,12 @@ const ConfigSchema = z.object({
   CMS_ACTIVE_LINK: z.string().default('.cms-active'),
   CMS_PACKAGE_MANAGER_COMMAND: z.string().min(1).default('pnpm'),
   CMS_ADMIN_DIST: z.string().default('apps/admin/dist'),
+  CMS_REMOTE_DEPLOY_HOST: z.string().optional(),
+  CMS_REMOTE_DEPLOY_PORT: z.coerce.number().int().min(1).max(65_535).default(22),
+  CMS_REMOTE_DEPLOY_USER: z.string().default('blogdeploy'),
+  CMS_REMOTE_DEPLOY_IDENTITY: z.string().default('/etc/blog-cms/deploy_key'),
+  CMS_REMOTE_KNOWN_HOSTS: z.string().default('/etc/blog-cms/known_hosts'),
+  CMS_REMOTE_BLOG_ROOT: z.string().default('/var/www/hangchi-blog'),
 });
 
 export type CmsConfig = {
@@ -28,6 +34,7 @@ export type CmsConfig = {
   activeLink: string;
   packageManagerCommand: string;
   adminDist: string;
+  remoteDeploy: null | { host: string; port: number; user: string; identityFile: string; knownHostsFile: string; root: string };
 };
 
 export function loadConfig(environment: NodeJS.ProcessEnv = process.env): CmsConfig {
@@ -45,5 +52,13 @@ export function loadConfig(environment: NodeJS.ProcessEnv = process.env): CmsCon
     activeLink: parsed.CMS_ACTIVE_LINK,
     packageManagerCommand: parsed.CMS_PACKAGE_MANAGER_COMMAND,
     adminDist: parsed.CMS_ADMIN_DIST,
+    remoteDeploy: parsed.CMS_REMOTE_DEPLOY_HOST ? {
+      host: parsed.CMS_REMOTE_DEPLOY_HOST,
+      port: parsed.CMS_REMOTE_DEPLOY_PORT,
+      user: parsed.CMS_REMOTE_DEPLOY_USER,
+      identityFile: parsed.CMS_REMOTE_DEPLOY_IDENTITY,
+      knownHostsFile: parsed.CMS_REMOTE_KNOWN_HOSTS,
+      root: parsed.CMS_REMOTE_BLOG_ROOT,
+    } : null,
   };
 }

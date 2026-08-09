@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc -p tsconfig.build.json && node scripts/copy-assets.mjs",
+    "build": "pnpm --filter @blog/contracts build && tsc -p tsconfig.build.json && node scripts/copy-assets.mjs",
     "migrate": "tsx src/db/migrate.ts",
     "create-admin": "tsx src/cli/create-admin.ts",
     "import": "tsx src/cli/import-posts.ts"

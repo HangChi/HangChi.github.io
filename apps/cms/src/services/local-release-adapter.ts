@@ -5,6 +5,7 @@ import path from 'node:path';
 import type { StoredPost } from '../repositories/types.js';
 import { resolveExportPath, serializePost } from './frontmatter.js';
 import type { PublishRequest } from './publisher.js';
+import { remoteActivationCommands, type RemoteReleaseOptions } from './remote-release.js';
 
 export type LocalReleaseOptions = {
   sourceRoot: string;
@@ -12,6 +13,7 @@ export type LocalReleaseOptions = {
   activeLink: string;
   packageManagerCommand?: string;
   retainedReleases?: number;
+  remote?: RemoteReleaseOptions;
 };
 
 const excludedRoots = new Set(['.git', '.worktrees', 'dist', 'node_modules']);
@@ -27,6 +29,7 @@ export class LocalReleaseAdapter {
   private readonly activeLink: string;
   private readonly packageManagerCommand: string;
   private readonly retainedReleases: number;
+  private readonly remote: RemoteReleaseOptions | undefined;
 
   constructor(options: LocalReleaseOptions) {
     this.sourceRoot = path.resolve(options.sourceRoot);
@@ -34,6 +37,7 @@ export class LocalReleaseAdapter {
     this.activeLink = path.resolve(options.activeLink);
     this.packageManagerCommand = options.packageManagerCommand ?? 'pnpm';
     this.retainedReleases = options.retainedReleases ?? 5;
+    this.remote = options.remote;
   }
 
   get executionLog(): string {
@@ -92,6 +96,16 @@ export class LocalReleaseAdapter {
 
   async activate(workspace: string): Promise<void> {
     const target = path.join(workspace, 'source', 'dist');
+    if (this.remote) {
+      const releaseName = path.basename(workspace);
+      const commands = remoteActivationCommands(this.remote, target, releaseName);
+      await this.run(commands.prepare.executable, commands.prepare.args, workspace);
+      await this.run(commands.rsync.executable, commands.rsync.args, workspace);
+      await this.run(commands.activate.executable, commands.activate.args, workspace);
+      this.append(`Activated remote ${releaseName}`);
+      await this.prune();
+      return;
+    }
     const temporaryLink = `${this.activeLink}.next-${process.pid}`;
     await mkdir(path.dirname(this.activeLink), { recursive: true });
     await rm(temporaryLink, { force: true, recursive: false });

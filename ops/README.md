@@ -4,16 +4,18 @@ The public blog remains an nginx-served Astro static site. The CMS API and admin
 
 ## Server layout
 
-- `/opt/blog-cms/source`: trusted CMS source checkout
+- `/opt/blog-cms/releases/<timestamp>`: immutable CMS application releases
+- `/opt/blog-cms/current`: symlink to the active CMS application release
 - `/etc/blog-cms/cms.env`: mode `0600`, runtime configuration
-- `/var/www/blog-releases`: immutable Astro releases, newest five retained
-- `/var/www/blog-current`: symlink nginx serves
+- `/var/lib/blog-cms/releases`: local build workspaces, newest five retained
+- `/var/www/hangchi-blog/releases`: immutable releases on the nginx host
+- `/var/www/hangchi-blog/current`: symlink nginx serves
 - `/var/backups/blog-cms`: daily compressed MySQL backups, retained 14 days
 
 ## Install/update
 
 1. Install Node.js 24, pnpm, nginx, and a MySQL 8 client.
-2. Build with `pnpm install --frozen-lockfile && pnpm build:admin && pnpm build:cms`.
+2. Build each new release with `pnpm install --frozen-lockfile && pnpm build:admin && pnpm build:cms`, then atomically update `/opt/blog-cms/current`.
 3. Copy `.env.cms.example` to `/etc/blog-cms/cms.env`, replace placeholders, remove the two `CMS_ADMIN_*` lines, and set mode `0600`.
 4. Install the unit files from `ops/systemd`, then run `systemctl daemon-reload`.
 5. Create the first administrator once by temporarily exporting `CMS_ADMIN_PASSWORD` and running `pnpm --filter @blog/cms create-admin`.
@@ -23,10 +25,10 @@ Never place a database or administrator password in Git, command history, or a s
 
 ## Private admin access
 
-From the local computer:
+The CMS host uses a dedicated `blogdeploy` SSH account and key to upload verified artifacts to the nginx host; the service never has an interactive root credential. From the local computer:
 
 ```bash
-ssh -L 8790:127.0.0.1:8790 root@39.99.232.157
+ssh -p 2002 -L 8790:127.0.0.1:8790 ubuntu@115.159.112.148
 ```
 
 Keep the session open and visit `http://127.0.0.1:8790`. The admin service is not publicly exposed.

@@ -16,6 +16,7 @@
     "build:admin": "pnpm --filter @blog/admin build",
     "build:cms": "pnpm --filter @blog/cms build",
     "build:all": "pnpm build:admin && pnpm build:cms && pnpm build",
+    "pretest": "pnpm --filter @blog/contracts build",
     "test": "vitest run",
     "test:admin": "vitest run apps/admin",
     "test:cms": "vitest run apps/cms",

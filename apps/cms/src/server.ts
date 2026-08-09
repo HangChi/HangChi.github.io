@@ -28,6 +28,7 @@ const releaseAdapter = new LocalReleaseAdapter({
   releasesRoot: config.releasesRoot,
   activeLink: config.activeLink,
   packageManagerCommand: config.packageManagerCommand,
+  ...(config.remoteDeploy ? { remote: config.remoteDeploy } : {}),
 });
 const publishQueue = new PublishQueue(publishJobStore, async (job) => {
   const publisher = new Publisher({

@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { AdminApp } from '../../app.js';
+import type { ApiClientLike } from '../../api/client.js';
 
 afterEach(cleanup);
 
@@ -26,7 +27,7 @@ describe('ArticleListPage', () => {
       session: async () => ({ admin: { id: '1', username: 'admin' }, csrfToken: 'c'.repeat(43), expiresAt: '2026-08-10T00:00:00.000Z' }),
       login: async () => { throw new Error('not used'); }, logout: async () => undefined, listPosts,
       deploymentState: async () => ({ databaseRevision: 2, deployedRevision: 2, activeRelease: 'r2', activeJob: null, lastJob: null }),
-    };
+    } as unknown as ApiClientLike;
     render(<AdminApp api={api} initialEntries={['/articles']} />);
     expect(await screen.findByText('Astro 后台')).toBeTruthy();
     await user.click(screen.getByRole('button', { name: '下一页' }));

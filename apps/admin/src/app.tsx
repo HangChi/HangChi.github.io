@@ -2,8 +2,11 @@ import { BrowserRouter, MemoryRouter, Navigate, Route, Routes } from 'react-rout
 
 import type { ApiClientLike } from './api/client.js';
 import { ArticleListPage } from './features/articles/article-list-page.js';
+import { ArticleEditorPage } from './features/editor/article-editor-page.js';
 import { AuthProvider, useAuth } from './features/auth/auth-provider.js';
 import { LoginPage } from './features/auth/login-page.js';
+import { PublishingPage } from './features/publishing/publishing-page.js';
+import { TaxonomyPage } from './features/taxonomy/taxonomy-page.js';
 import { AdminShell } from './layout/admin-shell.js';
 
 function Protected({ children }: { children: React.ReactNode }) {
@@ -22,11 +25,11 @@ function AppRoutes({ api }: { api: ApiClientLike }) {
     <Route element={<Protected><AdminShell api={api} /></Protected>}>
       <Route index element={<Placeholder title="仪表盘" />} />
       <Route path="articles" element={<ArticleListPage api={api} />} />
-      <Route path="articles/new" element={<Placeholder title="新建文章" />} />
-      <Route path="articles/:id" element={<Placeholder title="编辑文章" />} />
-      <Route path="categories" element={<Placeholder title="分类" />} />
-      <Route path="tags" element={<Placeholder title="标签" />} />
-      <Route path="publishing" element={<Placeholder title="发布记录" />} />
+      <Route path="articles/new" element={<ArticleEditorPage api={api} />} />
+      <Route path="articles/:id" element={<ArticleEditorPage api={api} />} />
+      <Route path="categories" element={<TaxonomyPage api={api} kind="categories" />} />
+      <Route path="tags" element={<TaxonomyPage api={api} kind="tags" />} />
+      <Route path="publishing" element={<PublishingPage api={api} />} />
     </Route>
     <Route path="*" element={<Navigate to="/articles" replace />} />
   </Routes>;

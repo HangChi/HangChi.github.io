@@ -5,5 +5,6 @@ import { HttpApiClient } from './api/client.js';
 import { AdminApp } from './app.js';
 import './styles/tokens.css';
 import './styles/global.css';
+import 'vditor/dist/index.css';
 
 createRoot(document.getElementById('root')!).render(<StrictMode><AdminApp api={new HttpApiClient()} /></StrictMode>);

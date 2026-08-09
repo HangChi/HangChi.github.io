@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { AdminApp } from '../../app.js';
+import type { ApiClientLike } from '../../api/client.js';
 
 afterEach(cleanup);
 
@@ -21,7 +22,7 @@ describe('LoginPage', () => {
       deploymentState: async () => ({
         databaseRevision: 0, deployedRevision: 0, activeRelease: null, activeJob: null, lastJob: null,
       }),
-    };
+    } as unknown as ApiClientLike;
     render(<AdminApp api={api} initialEntries={['/login']} />);
     await user.type(screen.getByLabelText('用户名'), 'admin');
     await user.type(screen.getByLabelText('密码'), 'secret password');

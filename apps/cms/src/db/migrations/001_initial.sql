@@ -59,7 +59,7 @@ CREATE TABLE posts (
   published_at DATETIME(3) NULL,
   pinned BOOLEAN NOT NULL DEFAULT FALSE,
   source_extension ENUM('md', 'mdx') NOT NULL DEFAULT 'md',
-  source_path VARCHAR(1024) NULL,
+  source_path VARCHAR(512) NULL,
   source_hash CHAR(64) NULL,
   version INT UNSIGNED NOT NULL DEFAULT 1,
   created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),

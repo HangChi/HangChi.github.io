@@ -22,7 +22,7 @@ export const PostInputSchema = z.object({
   pinned: z.boolean().default(false),
   publishedAt: z.string().datetime().nullable().optional(),
   sourceExtension: SourceExtensionSchema.default('md'),
-  sourcePath: z.string().max(1024).nullable().optional(),
+  sourcePath: z.string().max(512).nullable().optional(),
   version: z.number().int().positive().optional(),
 });
 

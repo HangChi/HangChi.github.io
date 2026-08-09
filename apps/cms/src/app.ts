@@ -8,10 +8,13 @@ import { registerAuthRoutes } from './routes/auth.js';
 import { registerPostRoutes } from './routes/posts.js';
 import { registerTaxonomyRoutes } from './routes/taxonomy.js';
 import { registerUploadRoutes, type ImageUploadService } from './routes/uploads.js';
+import { registerPublishingRoutes } from './routes/publishing.js';
 import { InvalidCredentialsError, type AuthService } from './services/auth-service.js';
 import { PostNotFoundError, type PostService } from './services/post-service.js';
 import { PostVersionConflictError } from './repositories/types.js';
 import type { TaxonomyRepository } from './repositories/taxonomy-repository.js';
+import type { PublishJobStore } from './services/publish-queue.js';
+import type { PublishQueuePort } from './services/post-service.js';
 
 export type AppDependencies = {
   authService: AuthService;
@@ -20,6 +23,8 @@ export type AppDependencies = {
   postService?: PostService;
   taxonomyRepository?: TaxonomyRepository;
   imageUploadService?: ImageUploadService;
+  publishJobStore?: PublishJobStore;
+  publishQueue?: PublishQueuePort;
 };
 
 export async function buildApp(dependencies: AppDependencies): Promise<FastifyInstance> {
@@ -48,6 +53,13 @@ export async function buildApp(dependencies: AppDependencies): Promise<FastifyIn
     await registerUploadRoutes(app, {
       authService: dependencies.authService,
       imageUploadService: dependencies.imageUploadService,
+    });
+  }
+  if (dependencies.publishJobStore && dependencies.publishQueue) {
+    await registerPublishingRoutes(app, {
+      authService: dependencies.authService,
+      publishJobStore: dependencies.publishJobStore,
+      publishQueue: dependencies.publishQueue,
     });
   }
 

@@ -8,6 +8,10 @@ const ConfigSchema = z.object({
   CMS_COOKIE_SECURE: z.stringbool().default(false),
   CMS_SESSION_HOURS: z.coerce.number().positive().max(168).default(12),
   EASYIMAGE_BASE_URL: z.string().url().default('http://115.159.112.148:40066'),
+  CMS_SOURCE_ROOT: z.string().default(process.cwd()),
+  CMS_RELEASES_ROOT: z.string().default('.cms-releases'),
+  CMS_ACTIVE_LINK: z.string().default('.cms-active'),
+  CMS_PACKAGE_MANAGER_COMMAND: z.string().min(1).default('pnpm'),
 });
 
 export type CmsConfig = {
@@ -18,6 +22,10 @@ export type CmsConfig = {
   cookieSecure: boolean;
   sessionHours: number;
   easyImageBaseUrl: string;
+  sourceRoot: string;
+  releasesRoot: string;
+  activeLink: string;
+  packageManagerCommand: string;
 };
 
 export function loadConfig(environment: NodeJS.ProcessEnv = process.env): CmsConfig {
@@ -30,5 +38,9 @@ export function loadConfig(environment: NodeJS.ProcessEnv = process.env): CmsCon
     cookieSecure: parsed.CMS_COOKIE_SECURE,
     sessionHours: parsed.CMS_SESSION_HOURS,
     easyImageBaseUrl: parsed.EASYIMAGE_BASE_URL.replace(/\/$/, ''),
+    sourceRoot: parsed.CMS_SOURCE_ROOT,
+    releasesRoot: parsed.CMS_RELEASES_ROOT,
+    activeLink: parsed.CMS_ACTIVE_LINK,
+    packageManagerCommand: parsed.CMS_PACKAGE_MANAGER_COMMAND,
   };
 }

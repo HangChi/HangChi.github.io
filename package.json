@@ -9,6 +9,7 @@
     "admin:legacy": "node scripts/blog-admin.mjs",
     "admin:dev": "pnpm --filter @blog/admin dev",
     "cms:dev": "pnpm --filter @blog/cms dev",
+    "cms:import": "pnpm --filter @blog/cms import",
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",

@@ -1,0 +1,13 @@
+[Unit]
+Description=Back up Personal Blog CMS database
+
+[Service]
+Type=oneshot
+User=blogcms
+Group=blogcms
+ExecStart=/opt/blog-cms/source/ops/scripts/backup-database.sh
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/backups/blog-cms

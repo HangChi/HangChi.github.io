@@ -60,6 +60,8 @@ const app = await buildApp({
   imageUploadService: new EasyImageService(config.easyImageBaseUrl),
   publishJobStore,
   publishQueue,
+  adminDist: config.adminDist,
+  readiness: async () => { await pool.query('SELECT 1'); },
   logger: true,
 });
 

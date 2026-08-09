@@ -12,6 +12,7 @@ const ConfigSchema = z.object({
   CMS_RELEASES_ROOT: z.string().default('.cms-releases'),
   CMS_ACTIVE_LINK: z.string().default('.cms-active'),
   CMS_PACKAGE_MANAGER_COMMAND: z.string().min(1).default('pnpm'),
+  CMS_ADMIN_DIST: z.string().default('apps/admin/dist'),
 });
 
 export type CmsConfig = {
@@ -26,6 +27,7 @@ export type CmsConfig = {
   releasesRoot: string;
   activeLink: string;
   packageManagerCommand: string;
+  adminDist: string;
 };
 
 export function loadConfig(environment: NodeJS.ProcessEnv = process.env): CmsConfig {
@@ -42,5 +44,6 @@ export function loadConfig(environment: NodeJS.ProcessEnv = process.env): CmsCon
     releasesRoot: parsed.CMS_RELEASES_ROOT,
     activeLink: parsed.CMS_ACTIVE_LINK,
     packageManagerCommand: parsed.CMS_PACKAGE_MANAGER_COMMAND,
+    adminDist: parsed.CMS_ADMIN_DIST,
   };
 }

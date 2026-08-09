@@ -1,0 +1,23 @@
+[Unit]
+Description=Personal Blog CMS
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=blogcms
+Group=blogcms
+WorkingDirectory=/opt/blog-cms/source
+EnvironmentFile=/etc/blog-cms/cms.env
+ExecStart=/usr/bin/node /opt/blog-cms/source/apps/cms/dist/server.js
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=120
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/blog-releases /var/www/blog-current
+
+[Install]
+WantedBy=multi-user.target

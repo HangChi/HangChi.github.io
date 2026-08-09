@@ -1,6 +1,9 @@
 import cookie from '@fastify/cookie';
 import rateLimit from '@fastify/rate-limit';
+import fastifyStatic from '@fastify/static';
 import Fastify, { type FastifyInstance } from 'fastify';
+import { access } from 'node:fs/promises';
+import path from 'node:path';
 import { ZodError } from 'zod';
 
 import { HttpAuthError } from './plugins/auth.js';
@@ -25,6 +28,8 @@ export type AppDependencies = {
   imageUploadService?: ImageUploadService;
   publishJobStore?: PublishJobStore;
   publishQueue?: PublishQueuePort;
+  adminDist?: string;
+  readiness?: () => Promise<void>;
 };
 
 export async function buildApp(dependencies: AppDependencies): Promise<FastifyInstance> {
@@ -63,9 +68,21 @@ export async function buildApp(dependencies: AppDependencies): Promise<FastifyIn
     });
   }
 
+  if (dependencies.adminDist) {
+    await access(path.join(dependencies.adminDist, 'index.html'));
+    await app.register(fastifyStatic, { root: path.resolve(dependencies.adminDist), wildcard: false });
+  }
+
   app.get('/api/health/live', async () => ({ ok: true }));
+  app.get('/api/health/ready', async (_request, reply) => {
+    try { await dependencies.readiness?.(); return { ok: true }; }
+    catch { return reply.status(503).send({ ok: false }); }
+  });
 
   app.setNotFoundHandler(async (request, reply) => {
+    if (dependencies.adminDist && request.method === 'GET' && !request.url.startsWith('/api/')) {
+      return reply.type('text/html').sendFile('index.html');
+    }
     return reply.status(404).send({ code: 'NOT_FOUND', message: '接口不存在' });
   });
 

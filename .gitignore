@@ -23,6 +23,7 @@ pnpm-debug.log*
 .idea/
 .gstack/
 .worktrees/
+.backups/
 
 # local agent settings
 .claude/settings.local.json

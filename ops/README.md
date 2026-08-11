@@ -11,6 +11,7 @@ The public blog remains an nginx-served Astro static site. The CMS API and admin
 - `/var/www/hangchi-blog/releases`: immutable releases on the nginx host
 - `/var/www/hangchi-blog/current`: symlink nginx serves
 - `/var/backups/blog-cms`: daily compressed MySQL backups, retained 14 days
+- `/var/lib/blog-cms/github-sync`: dedicated checkout used only to push `src/content/blog`
 
 ## Install/update
 
@@ -23,6 +24,10 @@ The public blog remains an nginx-served Astro static site. The CMS API and admin
 7. Start with `systemctl enable --now blog-cms blog-cms-backup.timer`.
 
 Never place a database or administrator password in Git, command history, or a systemd unit. Verify with `curl http://127.0.0.1:8790/api/health/ready`.
+
+## GitHub Pages content synchronization
+
+When `CMS_GITHUB_SYNC_REPOSITORY` is configured, a successful CMS release copies only the exported `src/content/blog` directory into a dedicated checkout, commits it, and pushes the configured branch. The existing GitHub Pages workflow then builds the new content. Use a repository deploy key with write access, keep its private key readable only by `blogcms`, and use strict host-key checking through `CMS_GITHUB_SYNC_KNOWN_HOSTS`.
 
 ## Private admin access
 

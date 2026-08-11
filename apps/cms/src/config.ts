@@ -19,6 +19,11 @@ const ConfigSchema = z.object({
   CMS_REMOTE_DEPLOY_IDENTITY: z.string().default('/etc/blog-cms/deploy_key'),
   CMS_REMOTE_KNOWN_HOSTS: z.string().default('/etc/blog-cms/known_hosts'),
   CMS_REMOTE_BLOG_ROOT: z.string().default('/var/www/hangchi-blog'),
+  CMS_GITHUB_SYNC_REPOSITORY: z.string().min(1).optional(),
+  CMS_GITHUB_SYNC_BRANCH: z.string().min(1).default('main'),
+  CMS_GITHUB_SYNC_ROOT: z.string().min(1).default('/var/lib/blog-cms/github-sync'),
+  CMS_GITHUB_SYNC_IDENTITY: z.string().min(1).default('/etc/blog-cms/github_deploy_key'),
+  CMS_GITHUB_SYNC_KNOWN_HOSTS: z.string().min(1).default('/etc/blog-cms/github_known_hosts'),
 });
 
 export type CmsConfig = {
@@ -35,6 +40,7 @@ export type CmsConfig = {
   packageManagerCommand: string;
   adminDist: string;
   remoteDeploy: null | { host: string; port: number; user: string; identityFile: string; knownHostsFile: string; root: string };
+  githubSync: null | { repositoryUrl: string; branch: string; checkoutRoot: string; identityFile: string; knownHostsFile: string };
 };
 
 export function loadConfig(environment: NodeJS.ProcessEnv = process.env): CmsConfig {
@@ -59,6 +65,13 @@ export function loadConfig(environment: NodeJS.ProcessEnv = process.env): CmsCon
       identityFile: parsed.CMS_REMOTE_DEPLOY_IDENTITY,
       knownHostsFile: parsed.CMS_REMOTE_KNOWN_HOSTS,
       root: parsed.CMS_REMOTE_BLOG_ROOT,
+    } : null,
+    githubSync: parsed.CMS_GITHUB_SYNC_REPOSITORY ? {
+      repositoryUrl: parsed.CMS_GITHUB_SYNC_REPOSITORY,
+      branch: parsed.CMS_GITHUB_SYNC_BRANCH,
+      checkoutRoot: parsed.CMS_GITHUB_SYNC_ROOT,
+      identityFile: parsed.CMS_GITHUB_SYNC_IDENTITY,
+      knownHostsFile: parsed.CMS_GITHUB_SYNC_KNOWN_HOSTS,
     } : null,
   };
 }

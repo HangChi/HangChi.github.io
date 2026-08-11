@@ -10,6 +10,7 @@ function ports(events: string[]): PublisherPorts {
     build: async () => { events.push('build'); },
     verify: async () => { events.push('verify'); },
     activate: async () => { events.push('activate'); },
+    sync: async () => { events.push('sync'); },
     recordSuccess: async () => { events.push('record'); },
     recordFailure: async () => { events.push('failed'); },
   };
@@ -27,6 +28,6 @@ describe('Publisher', () => {
   it('activates only after output verification succeeds', async () => {
     const events: string[] = [];
     await new Publisher(ports(events)).publish({ id: '9', trigger: 'publish' });
-    expect(events).toEqual(['snapshot', 'workspace', 'export', 'build', 'verify', 'activate', 'record']);
+    expect(events).toEqual(['snapshot', 'workspace', 'export', 'build', 'verify', 'activate', 'sync', 'record']);
   });
 });

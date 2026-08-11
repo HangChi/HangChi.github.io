@@ -14,6 +14,7 @@ export type PublisherPorts = {
   build(workspace: string): Promise<void>;
   verify(workspace: string): Promise<void>;
   activate(workspace: string, revision: number): Promise<void>;
+  sync?(workspace: string, revision: number): Promise<void>;
   recordSuccess(request: PublishRequest, workspace: string, revision: number): Promise<void>;
   recordFailure(request: PublishRequest, error: Error): Promise<void>;
 };
@@ -34,6 +35,7 @@ export class Publisher {
       await this.ports.build(workspace);
       await this.ports.verify(workspace);
       await this.ports.activate(workspace, snapshot.revision);
+      await this.ports.sync?.(workspace, snapshot.revision);
       await this.ports.recordSuccess(request, workspace, snapshot.revision);
       return { workspace, revision: snapshot.revision };
     } catch (error) {

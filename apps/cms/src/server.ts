@@ -8,6 +8,7 @@ import { MysqlTaxonomyRepository } from './repositories/taxonomy-repository.js';
 import { MysqlPublishJobStore } from './repositories/mysql-publish-job-store.js';
 import { AuthService } from './services/auth-service.js';
 import { EasyImageService } from './services/easyimage-service.js';
+import { GitHubContentSync } from './services/github-content-sync.js';
 import { LocalReleaseAdapter } from './services/local-release-adapter.js';
 import { PostService } from './services/post-service.js';
 import { PublishQueue } from './services/publish-queue.js';
@@ -30,6 +31,7 @@ const releaseAdapter = new LocalReleaseAdapter({
   packageManagerCommand: config.packageManagerCommand,
   ...(config.remoteDeploy ? { remote: config.remoteDeploy } : {}),
 });
+const githubContentSync = config.githubSync ? new GitHubContentSync(config.githubSync) : null;
 const publishQueue = new PublishQueue(publishJobStore, async (job) => {
   const publisher = new Publisher({
     snapshot: () => postRepository.snapshotPublished(),
@@ -38,6 +40,9 @@ const publishQueue = new PublishQueue(publishJobStore, async (job) => {
     build: (workspace) => releaseAdapter.build(workspace),
     verify: (workspace) => releaseAdapter.verify(workspace),
     activate: (workspace) => releaseAdapter.activate(workspace),
+    ...(githubContentSync ? {
+      sync: (workspace: string, revision: number) => githubContentSync.sync(workspace, revision).then(() => undefined),
+    } : {}),
     recordSuccess: (request, workspace, revision) => publishJobStore.markSucceeded(
       request.id,
       path.basename(workspace),

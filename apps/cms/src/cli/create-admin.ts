@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { ADMIN_PASSWORD_MIN_LENGTH } from '@blog/contracts';
 import { hash } from 'argon2';
 import type { RowDataPacket } from 'mysql2/promise';
 
@@ -10,12 +11,16 @@ import { runMigrations } from '../db/migrate.js';
 
 type CountRow = RowDataPacket & { total: number };
 
+export function validateInitialAdminPassword(password: string | undefined): asserts password is string {
+  if (!password || password.length < ADMIN_PASSWORD_MIN_LENGTH) {
+    throw new Error(`CMS_ADMIN_PASSWORD 必须通过环境变量提供，且至少 ${ADMIN_PASSWORD_MIN_LENGTH} 个字符`);
+  }
+}
+
 export async function createInitialAdmin(environment: NodeJS.ProcessEnv = process.env): Promise<void> {
   const username = (environment.CMS_ADMIN_USERNAME ?? 'admin').trim().toLocaleLowerCase('en-US');
   const password = environment.CMS_ADMIN_PASSWORD;
-  if (!password || password.length < 12) {
-    throw new Error('CMS_ADMIN_PASSWORD 必须通过环境变量提供，且至少 12 个字符');
-  }
+  validateInitialAdminPassword(password);
 
   const config = loadConfig(environment);
   const pool = createDatabasePool(config.databaseUrl);

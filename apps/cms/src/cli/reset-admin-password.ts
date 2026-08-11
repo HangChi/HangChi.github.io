@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { ADMIN_PASSWORD_MIN_LENGTH } from '@blog/contracts';
 import { hash } from 'argon2';
 import type { RowDataPacket } from 'mysql2/promise';
 
@@ -10,7 +11,9 @@ import { createDatabasePool } from '../db/client.js';
 type CountRow = RowDataPacket & { total: number };
 
 export function validatePasswordReset(password: string | undefined, administratorCount: number): asserts password is string {
-  if (!password || password.length < 12) throw new Error('CMS_ADMIN_PASSWORD must contain at least 12 characters');
+  if (!password || password.length < ADMIN_PASSWORD_MIN_LENGTH) {
+    throw new Error(`CMS_ADMIN_PASSWORD must contain at least ${ADMIN_PASSWORD_MIN_LENGTH} characters`);
+  }
   if (administratorCount !== 1) throw new Error('Password reset requires exactly one administrator');
 }
 

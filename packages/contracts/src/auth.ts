@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export const ADMIN_PASSWORD_MIN_LENGTH = 8;
+
 export const LoginRequestSchema = z.object({
   username: z.string().trim().min(1).max(64),
   password: z.string().min(1).max(1024),
@@ -18,7 +20,7 @@ export const SessionResponseSchema = z.object({
 
 export const ChangePasswordRequestSchema = z.object({
   currentPassword: z.string().min(1).max(1024),
-  newPassword: z.string().min(12).max(1024),
+  newPassword: z.string().min(ADMIN_PASSWORD_MIN_LENGTH).max(1024),
 });
 
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;

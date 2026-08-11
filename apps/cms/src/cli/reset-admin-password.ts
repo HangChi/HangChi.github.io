@@ -1,3 +1,4 @@
+import { realpathSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -9,6 +10,19 @@ import { loadConfig } from '../config.js';
 import { createDatabasePool } from '../db/client.js';
 
 type CountRow = RowDataPacket & { total: number };
+
+export function isResetAdminPasswordEntrypoint(
+  argvPath: string | undefined,
+  modulePath = fileURLToPath(import.meta.url),
+  resolveRealPath: (candidate: string) => string = realpathSync,
+): boolean {
+  if (!argvPath) return false;
+  try {
+    return resolveRealPath(path.resolve(argvPath)) === resolveRealPath(path.resolve(modulePath));
+  } catch {
+    return false;
+  }
+}
 
 export function validatePasswordReset(password: string | undefined, administratorCount: number): asserts password is string {
   if (!password || password.length < ADMIN_PASSWORD_MIN_LENGTH) {
@@ -36,7 +50,7 @@ export async function resetAdminPassword(environment: NodeJS.ProcessEnv = proces
   } finally { await pool.end(); }
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isResetAdminPasswordEntrypoint(process.argv[1])) {
   resetAdminPassword()
     .then(() => console.log('CMS administrator password reset.'))
     .catch((error: unknown) => {

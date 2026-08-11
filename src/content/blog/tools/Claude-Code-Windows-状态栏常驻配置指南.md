@@ -1,8 +1,10 @@
 ---
-title: '📑 Claude Code Windows 状态栏常驻配置指南'
-description: '本指南用于在 Windows 环境下为 Claude Code 配置稳定、常驻的自定义底部状态栏（Statusline）。通过 **Node.js 脚本** 替代传统的 Bash 脚本，彻底解决 Windows 环境下的路径转义、特殊字符冲'
+title: 📑 Claude Code Windows 状态栏常驻配置指南
+description: 本指南用于在 Windows 环境下为 Claude Code 配置稳定、常驻的自定义底部状态栏（Statusline）。通过 **Node.js 脚本** 替代传统的 Bash 脚本，彻底解决 Windows 环境下的路径转义、特殊字符冲
 pubDate: 2026-06-19
-tags: ['工具']
+category: tools
+tags:
+  - 工具
 draft: false
 pinned: false
 ---

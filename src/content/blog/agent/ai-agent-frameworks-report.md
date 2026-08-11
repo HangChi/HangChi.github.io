@@ -1,11 +1,18 @@
 ---
-title: 'AI Agent 框架全景报告 (2025-2026)'
-description: '系统整理 30+ 主流 AI Agent 框架，涵盖通用框架、多 Agent 协作、自主 Agent、低代码平台、企业级框架等，附 GitHub 地址与选型指南。'
+title: AI Agent 框架全景报告 (2025-2026)
+description: 系统整理 30+ 主流 AI Agent 框架，涵盖通用框架、多 Agent 协作、自主 Agent、低代码平台、企业级框架等，附 GitHub 地址与选型指南。
 pubDate: 2026-07-27
-category: 'agent'
-tags: ['AI Agent', 'Agent 框架', '技术选型', 'LangChain', '多Agent协作', '选型指南']
+category: agent
+tags:
+  - Agent 框架
+  - AI Agent
+  - LangChain
+  - 多Agent协作
+  - 技术选型
+  - 选型指南
+draft: false
+pinned: false
 ---
-
 > 系统整理当前主流的 AI Agent 框架，涵盖通用框架、多 Agent 协作框架、自主 Agent、低代码平台、企业级框架等，附 GitHub 地址与官网链接。
 
 **整理时间：** 2026 年 7 月 ｜ **涵盖：** 30+ 框架

@@ -1,8 +1,12 @@
 ---
-title: 'LM Studio安装与使用'
-description: 'LM Studio 是一款本地运行大模型(LLM)的 GUI 程序'
+title: LM Studio安装与使用
+description: LM Studio 是一款本地运行大模型(LLM)的 GUI 程序
 pubDate: 2025-04-13
-tags: ['部署教程']
+category: tutorials
+tags:
+  - 部署教程
+draft: false
+pinned: false
 ---
 ## 一、介绍
 LM Studio 是一款本地运行大模型(LLM)的 GUI 程序
@@ -57,4 +61,3 @@ HuggingFace 国内有一个镜像站， https://hf-mirror.com/，我们可以使
 ```
 
 4. 关闭并重启LM Studio
-

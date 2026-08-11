@@ -1,11 +1,15 @@
 ---
-title: '用 Astro 从零搭建个人技术博客并部署到 GitHub Pages'
-description: '从环境准备、核心配置、功能实现到 GitHub Pages 自动部署的完整建站教程。'
+title: 用 Astro 从零搭建个人技术博客并部署到 GitHub Pages
+description: 从环境准备、核心配置、功能实现到 GitHub Pages 自动部署的完整建站教程。
 pubDate: 2026-06-11
-tags: ['Astro', '建站', '教程']
+category: astro-blog-deploy-guide-md
+tags:
+  - Astro
+  - 建站
+  - 教程
+draft: false
 pinned: true
 ---
-
 > 本文记录用 **Astro + GitHub Pages** 搭建个人技术博客的完整流程，从环境准备到上线，照着做即可得到一个支持深色模式、中文排版、标签分类、评论、RSS 的博客。
 
 ---

@@ -1,9 +1,13 @@
 ---
-title: '常见数据结构定义(Java)'
-description: 'LeetCode 刷题中常用的数据结构定义模板，包含 ListNode、TreeNode、TrieNode、UnionFind 等 17 种常见结构及其使用场景。'
+title: 常见数据结构定义(Java)
+description: LeetCode 刷题中常用的数据结构定义模板，包含 ListNode、TreeNode、TrieNode、UnionFind 等 17 种常见结构及其使用场景。
 pubDate: 2026-06-27
-category: 'leetcode'
-tags: ['LeetCode', '模板']
+category: leetcode
+tags:
+  - LeetCode
+  - 模板
+draft: false
+pinned: false
 ---
 ## 1. 单链表节点 ListNode
 

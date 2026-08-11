@@ -1,8 +1,12 @@
 ---
-title: '服务器备份（Windows也适用）'
-description: 'FreeFileSync + freeSSHd + Windows任务计划程序'
+title: 服务器备份（Windows也适用）
+description: FreeFileSync + freeSSHd + Windows任务计划程序
 pubDate: 2025-04-13
-tags: ['部署教程']
+category: tutorials
+tags:
+  - 部署教程
+draft: false
+pinned: false
 ---
 ## 一、方案
 FreeFileSync + freeSSHd + Windows任务计划程序
@@ -92,4 +96,3 @@ FreeFileSync、freeSSHd安装过程全部下一步/是 即可。
 ![](/tutorials/assets/image-20240807223056563.png)
 
 4. 设置完成后可以手动运行一下查看效果
-

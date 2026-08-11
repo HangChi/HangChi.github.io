@@ -1,10 +1,14 @@
 ---
-title: '欢迎来到我的博客'
-description: '第一篇文章：介绍这个博客的功能与技术栈。'
+title: 欢迎来到我的博客
+description: 第一篇文章：介绍这个博客的功能与技术栈。
 pubDate: 2026-06-11
-tags: ['公告', 'Astro']
+category: welcome-md
+tags:
+  - Astro
+  - 公告
+draft: false
+pinned: false
 ---
-
 这是用 **Astro** 搭建的个人技术博客的第一篇文章 🎉。
 
 ## 这个博客有什么

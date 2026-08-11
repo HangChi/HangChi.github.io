@@ -1,10 +1,14 @@
 ---
-title: 'Markdown 写作语法速查'
-description: '常用的 Markdown 排版元素演示，方便写作时参考。'
+title: Markdown 写作语法速查
+description: 常用的 Markdown 排版元素演示，方便写作时参考。
 pubDate: 2026-06-10
-tags: ['Markdown', '教程']
+category: markdown-guide-md
+tags:
+  - Markdown
+  - 教程
+draft: false
+pinned: false
 ---
-
 这篇文章演示常见的 Markdown 元素在本博客主题下的渲染效果。
 
 ## 文本样式

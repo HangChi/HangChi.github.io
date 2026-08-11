@@ -1,8 +1,12 @@
 ---
-title: 'LightRAG部署与使用'
-description: '修改对应文件examples/lightragollamademo.py：'
+title: LightRAG部署与使用
+description: 修改对应文件examples/lightragollamademo.py：
 pubDate: 2025-04-14
-tags: ['部署教程']
+category: tutorials
+tags:
+  - 部署教程
+draft: false
+pinned: false
 ---
 ## 一、安装
 ### 从源码安装 （推荐）
@@ -44,4 +48,3 @@ pip install lightrag-hku
 注：
 
 1. qwen 模型构建后没有实体和关系
-

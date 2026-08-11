@@ -1,8 +1,12 @@
 ---
-title: 'GraphRAG部署'
-description: '版本：GraphRAG1.1.1'
+title: GraphRAG部署
+description: 版本：GraphRAG1.1.1
 pubDate: 2025-04-14
-tags: ['部署教程']
+category: tutorials
+tags:
+  - 部署教程
+draft: false
+pinned: false
 ---
 版本：GraphRAG1.1.1
 
@@ -120,4 +124,3 @@ graphrag update --config ragtest/settings.yaml --root . --verbose --memprofile -
 ## 四、常见问题
 1. 目前最新版本(2.0 及以上，可能还要再低一点)使用本地模型只支持 OpenAI 兼容接口，不支持 Ollama 本地部署以及推理模型。
 2. 1.0 版本不支持 Ollama 嵌入模型，嵌入模型需要使用其他方式。
-

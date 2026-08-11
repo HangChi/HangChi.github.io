@@ -1,11 +1,16 @@
 ---
-title: 'BigDecimal 工具类分享'
-description: '整理一个常用的 Java BigDecimal 工具类，封装加减乘除、取整、类型转换和比较等静态方法。'
+title: BigDecimal 工具类分享
+description: 整理一个常用的 Java BigDecimal 工具类，封装加减乘除、取整、类型转换和比较等静态方法。
 pubDate: 2026-06-13
-category: 'tools'
-tags: ['Java', 'BigDecimal', '工具类', '精度计算']
+category: tools
+tags:
+  - BigDecimal
+  - Java
+  - 工具类
+  - 精度计算
+draft: false
+pinned: false
 ---
-
 网上有一个使用人数比较多的 `BigDecimal` 工具类，提供了多个静态方法来简化 `BigDecimal` 的操作：
 
 ```java

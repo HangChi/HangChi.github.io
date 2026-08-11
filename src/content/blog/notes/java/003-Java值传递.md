@@ -1,9 +1,11 @@
 ---
-title: 'Java 值传递'
-description: '- **实参（实际参数，Arguments）**：用于传递给函数/方法的参数，必须有确定的值。 - **形参（形式参数，Parameters）**：用于定义函数/方法，接收实参，不需要有确定的值。 - **值传递**：方法接收的是实参值的拷'
+title: Java 值传递
+description: "- **实参（实际参数，Arguments）**：用于传递给函数/方法的参数，必须有确定的值。 - **形参（形式参数，Parameters）**：用于定义函数/方法，接收实参，不需要有确定的值。 - **值传递**：方法接收的是实参值的拷"
 pubDate: 2026-06-21
-category: 'notes'
-tags: ['Java', '笔记']
+category: notes
+tags:
+  - Java
+  - 笔记
 draft: false
 pinned: false
 ---

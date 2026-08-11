@@ -1,11 +1,17 @@
 ---
-title: 'Claude Code 推荐安装的 Skills'
-description: '整理 Claude Code 常用 Skills 和插件生态，包括 Skill Creator、Find Skills、Superpowers、gstack、HyperFrames、Obsidian Skills 与飞书 CLI。'
+title: Claude Code 推荐安装的 Skills
+description: 整理 Claude Code 常用 Skills 和插件生态，包括 Skill Creator、Find Skills、Superpowers、gstack、HyperFrames、Obsidian Skills 与飞书 CLI。
 pubDate: 2026-06-13
-category: 'agent'
-tags: ['Claude Code', 'Agent Skills', 'AI Agent', '工具', '效率工具']
+category: agent
+tags:
+  - Agent Skills
+  - AI Agent
+  - Claude Code
+  - 工具
+  - 效率工具
+draft: false
+pinned: false
 ---
-
 > 记录推荐安装的 Claude Code Skills / Plugins，包含功能介绍、GitHub 仓库地址、安装方式、使用方式与常用命令。
 
 ## 目录

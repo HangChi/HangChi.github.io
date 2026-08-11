@@ -1,8 +1,12 @@
 ---
-title: 'MinerU部署与使用'
-description: '仓库地址：[https://github.com/opendatalab/MinerU](https://github.com/openda'
+title: MinerU部署与使用
+description: 仓库地址：[https://github.com/opendatalab/MinerU](https://github.com/openda
 pubDate: 2025-04-12
-tags: ['部署教程']
+category: tutorials
+tags:
+  - 部署教程
+draft: false
+pinned: false
 ---
 ### 介绍
 仓库地址：[https://github.com/opendatalab/MinerU](https://github.com/opendatalab/MinerU)
@@ -535,4 +539,3 @@ for ds in dss:
     )
     count += 1
 ```
-

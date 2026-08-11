@@ -158,7 +158,7 @@ export class MysqlPostRepository implements PostRepository {
     const offset = (query.page - 1) * query.pageSize;
 
     const [countRows] = await this.pool.execute<CountRow[]>(`SELECT COUNT(*) AS total FROM posts p ${whereSql}`, parameters);
-    const [rows] = await this.pool.execute<PostRow[]>(`${postSelect} ${whereSql} ORDER BY ${orderSql} LIMIT ? OFFSET ?`, [
+    const [rows] = await this.pool.query<PostRow[]>(`${postSelect} ${whereSql} ORDER BY ${orderSql} LIMIT ? OFFSET ?`, [
       ...parameters,
       query.pageSize,
       offset,
@@ -334,7 +334,7 @@ export class MysqlPostRepository implements PostRepository {
 
   async listVersions(id: string, limit = 50): Promise<PostVersion[]> {
     const safeLimit = Math.max(1, Math.min(100, limit));
-    const [rows] = await this.pool.execute<VersionRow[]>(`
+    const [rows] = await this.pool.query<VersionRow[]>(`
       SELECT id, post_id, version, reason, snapshot, created_at
       FROM post_versions WHERE post_id = ? ORDER BY version DESC LIMIT ?
     `, [id, safeLimit]);

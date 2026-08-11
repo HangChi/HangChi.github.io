@@ -116,7 +116,7 @@ export class MysqlPublishJobStore implements PublishJobStore {
 
   async list(limit = 30): Promise<PublishJobRecord[]> {
     const safeLimit = Math.max(1, Math.min(100, limit));
-    const [rows] = await this.pool.execute<JobRow[]>(`${selectJob} ORDER BY id DESC LIMIT ?`, [safeLimit]);
+    const [rows] = await this.pool.query<JobRow[]>(`${selectJob} ORDER BY id DESC LIMIT ?`, [safeLimit]);
     return rows.map(mapJob);
   }
 
